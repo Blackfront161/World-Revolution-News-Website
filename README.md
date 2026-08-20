@@ -67,14 +67,27 @@ Versionsgebundene Tests älterer Ordner dürfen nicht durch bloßes Ändern ihre
 
 Öffentliche Artikel verwenden stabile IDs im Format `wrn-…-…`. Der veröffentlichte r10n-Stand enthält 935 statische Artikelverzeichnisse. Existiert eine statische Landingpage, wird sie als teilbare und suchmaschinenlesbare URL verwendet. Fehlt sie, leitet `.htaccess` sicher auf `/?article=<id>` weiter.
 
-Feed, `article-landing-manifest.json`, `articles/` und `sitemap.xml` müssen aus derselben Datenrevision erzeugt und gemeinsam veröffentlicht werden. Der Generator selbst ist in diesem Website-Stand noch nicht als reproduzierbares Werkzeug enthalten. Bis er ergänzt ist, gilt:
+Feed, `article-landing-manifest.json`, `articles/` und `sitemap.xml` müssen aus derselben Datenrevision erzeugt und gemeinsam veröffentlicht werden. Der append-only Generator liegt unter `tools/generate-article-landings.mjs`. Sein sicherer Standardmodus prüft ausschließlich und schreibt nichts:
+
+```text
+node tools/generate-article-landings.mjs
+node --test qa-generator/article-generator.test.mjs
+```
+
+Erst `node tools/generate-article-landings.mjs --write` autorisiert das Erzeugen neuer Landingpages sowie den transaktionalen Austausch von Manifest und Sitemap. Vorhandene Artikelseiten werden dabei validiert, aber nie gelöscht oder ungefragt neu geschrieben. Eine exklusive Sperre verhindert parallele Läufe. Vor der ersten Umbenennung im Arbeitskandidaten werden Stagingdateien, Backups und ein prüfsummenbewehrtes Journal geschrieben. Nach einem abgebrochenen Generatorprozess stellt der nächste Start idempotent entweder den vollständig alten Stand wieder her oder bestätigt den bereits vollständig neuen Stand; erst nach Hash- und Mengenprüfung werden Journal und Backups entfernt. Der normale `--check` verändert keine Website-Inhalte, darf aber eine abgebrochene Generatortransaktion wiederherstellen.
+
+Das ist ein **prozessabbruchfestes transaktionales Recovery mit Best-Effort-Dateisystempersistenz**, keine Zusage von Stromausfall-, Kernel- oder Datenträger-Atomizität. Nach einem solchen Systemverlust kann die vollständige Wiederherstellung aus Git und dem unveränderlichen Release-/Rollbackpaket nötig sein. Der Generator besitzt keine Upload- oder Deploymentfunktion und darf mit `--write` nur in einem Worktree beziehungsweise Releasekandidaten laufen, niemals direkt im live ausgelieferten `public_html`.
+
+Feedzeilen ohne Titel, Inhalt, gültiges Datum oder absolute HTTPS-Originaladresse erscheinen mit Begründung im deterministischen QA-Bericht.
+
+Für die Veröffentlichung gilt weiterhin:
 
 - niemals nur `news*.json` austauschen;
-- neue Artikel-Landingpages und Sitemap zusammen erzeugen und prüfen;
+- neue Artikel-Landingpages, Manifest und Sitemap zusammen erzeugen und prüfen;
 - nur IDs teilen, die in der Zielrevision auflösbar sind;
 - das gesamte Ergebnis als unveränderliches Releasepaket behandeln.
 
-Die Aufnahme eines reproduzierbaren, atomaren Artikel-/Sitemap-Generators ist ein offener Punkt mit hoher Priorität.
+Die vollständige Rekonstruktion historischer Seiten aus einem versionierten Artikelkatalog sowie der Reader-Fallback für nicht mehr im aktiven Feed enthaltene Artikel bleiben offene Folgearbeiten.
 
 ## Deployment und Rollback
 
@@ -114,7 +127,7 @@ Für einen Rollback wird die gesicherte vorherige `public_html`-Fassung vollstä
 
 Priorisierte Website-Aufgaben:
 
-1. reproduzierbaren Artikel-/Sitemap-Generator erstellen und Feed, Manifest, Landingpages sowie Sitemap atomar veröffentlichen;
+1. historischen Artikelkatalog und Reader-Fallback für aus dem aktiven Feed gefallene Landingpages ergänzen;
 2. fehlende optionale Datensätze (`library-feed.json`, `library-sources.json`, `video-feed.json`, `video-health.json`, `editorial-decisions.json`) bereitstellen oder unnötige Remote-Abfragen entfernen;
 3. Originalartikel sofort anzeigen, Übersetzung asynchron laden und den Vergleich standardmäßig einklappen;
 4. Desktop-Header und sehr große Artikelüberschriften weiter verdichten;
@@ -130,4 +143,3 @@ Priorisierte Website-Aufgaben:
 - App- und Website-Änderungen getrennt prüfen.
 - Keine alten Versionen, Daten oder Rückfallsicherungen löschen, bevor der aktuelle Stand reproduzierbar in Git und als externes Releaseartefakt gesichert ist.
 - Veröffentlichung erst nach unabhängiger Prüfung des tatsächlichen Kandidaten.
-

@@ -44,6 +44,10 @@ coverage/
 .tmp/
 tmp/
 temp/
+.article-generator.lock
+.article-generator.lock.candidate-*
+.article-generator.lock.stale-*
+.article-generator-transaction/
 qa-*/.tmp/
 qa-*/profiles/
 qa-*/artifacts/
@@ -79,4 +83,3 @@ public_html-pre-*.zip
 # Git merge and patch leftovers
 *.orig
 *.rej
-
