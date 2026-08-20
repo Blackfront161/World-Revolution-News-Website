@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="de" class="website-portal" data-font-size="200">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="../news-app-2.css?release=40">
+  <link rel="stylesheet" href="../news-app-2-website.css?release=37">
+  <title>r10m Reflow Contract</title>
+</head>
+<body>
+  <main id="next-main">
+    <article class="home-hero">
+      <div class="home-hero__content">
+        <h1>Gemeinsame Immobilienaufgaben bleiben solidarisch lösbar</h1>
+        <div class="card-actions"><button class="small-action" type="button">Artikel öffnen</button><button class="translate-card" type="button">Übersetzen</button></div>
+      </div>
+    </article>
+
+    <section class="home-today" aria-label="Heute">
+      <div class="home-today__grid">
+        <article class="home-today-card">
+          <header><span aria-hidden="true">↻</span><div><small>Seit deinem letzten Besuch</small><strong>Neue internationale Berichte</strong></div></header>
+          <div class="home-today-updates"><a href="#article"><strong>Internationaler Solidaritätsbericht mit einem außergewöhnlich langen Nachrichtentitel</strong><small>Unabhängige Quelle</small></a></div>
+          <button class="home-today-link" type="button">Zum Nachrichtenarchiv →</button>
+        </article>
+        <article class="home-today-card">
+          <header><span aria-hidden="true">◎</span><div><small>Abdeckung</small><strong>Internationale Perspektiven</strong></div></header>
+          <div class="home-today-metrics"><span><b>7</b>Sprachen</span><span><b>7</b>Regionen</span><span><b>18</b>Quellen</span></div>
+          <button class="home-today-link" type="button">Quellen entdecken →</button>
+        </article>
+        <article class="home-today-card">
+          <header><span aria-hidden="true">✦</span><div><small>Solidarität</small><strong>Geprüfte Aktionen</strong></div></header>
+          <p>Unterstützung für politische Gefangene und grenzüberschreitende Solidaritätskampagnen.</p>
+          <div class="home-today-actions"><button type="button">Hilfe finden</button><button type="button">Solidarität öffnen</button><button type="button">Live-Dossiers</button></div>
+        </article>
+        <article class="home-today-card home-today-card--wide">
+          <header><span aria-hidden="true">A</span><div><small>Aktionspaket</small><strong>Materialien gemeinsam nutzen</strong></div></header>
+          <p>Vorlagen, Texte und Hinweise für lokale Aktionen.</p>
+          <button class="home-today-link" type="button">Vorlagen öffnen →</button>
+        </article>
+      </div>
+    </section>
+
+    <article class="news-card">
+      <div class="news-card__body">
+        <h3>Nachricht</h3>
+        <div class="card-actions">
+          <button class="small-action" type="button">Öffnen</button>
+          <button class="translate-card" type="button"><span aria-hidden="true">★</span><span>Übersetzen</span></button>
+          <button class="save-card" type="button" aria-label="Speichern">☆</button>
+        </div>
+      </div>
+      <div class="news-card__image"></div>
+    </article>
+
+    <dialog class="article-dialog" open>
+      <div class="dialog-shell">
+        <div class="dialog-header"><div><small>Unabhängige Nachrichtenquelle</small><strong id="next-article-title">Internationale Solidaritätsbewegungen organisieren außergewöhnliche Gemeinschaftsaufgaben</strong></div><button class="dialog-close" type="button">×</button></div>
+        <div class="dialog-actions"><button type="button">Original öffnen</button><button type="button">Übersetzen</button><button type="button">Zusammenfassen</button><button id="next-dialog-share" type="button">Artikel teilen</button><button type="button">Speichern</button></div>
+      </div>
+    </dialog>
+  </main>
+  <pre id="qa-result"></pre>
+  <script>
+    const params = new URLSearchParams(location.search);
+    if (params.get('mode') === 'normal') document.documentElement.removeAttribute('data-font-size');
+    const selectors = params.get('scope') === 'dialog'
+      ? ['#next-article-title', '.article-dialog .dialog-actions', '.article-dialog .dialog-actions button']
+      : params.get('mode') === 'normal'
+        ? ['.news-card .card-actions', '.news-card .translate-card', '.news-card .small-action', '.news-card .save-card']
+        : params.get('scope') === 'desktop'
+        ? [
+            '.home-hero', '.home-hero__content', '.home-hero h1', '.home-hero .card-actions',
+            '.home-hero .card-actions button', '.news-card', '.news-card__body',
+            '.news-card .card-actions', '.news-card .card-actions button', '#next-article-title',
+            '.article-dialog .dialog-actions', '.article-dialog .dialog-actions button'
+          ]
+        : [
+            '.home-today__grid', '.home-today-card', '.home-today-card header',
+            '.home-today-card header div', '.home-today-metrics', '.home-today-metrics span',
+            '.home-today-actions', '.home-today-actions button', '.home-today-updates',
+            '.home-today-updates a', '.home-today-card > p', '.home-today-link'
+          ];
+    function collect(win, doc) {
+      const measurements = selectors.flatMap(selector => [...doc.querySelectorAll(selector)].map((node, index) => ({
+        selector,
+        index,
+        clientWidth: node.clientWidth,
+        scrollWidth: node.scrollWidth,
+        fits: node.scrollWidth <= node.clientWidth + 1
+      })));
+      document.querySelector('#qa-result').textContent = JSON.stringify({
+        viewport: win.innerWidth,
+        mode: params.get('mode') || '200',
+        measurements
+      });
+    }
+    if (params.get('inner') !== '1') {
+      document.querySelector('#next-main').hidden = true;
+      const frame = document.createElement('iframe');
+      frame.style.cssText = `display:block;width:${Number(params.get('viewport'))}px;height:900px;border:0`;
+      const innerUrl = new URL(location.href);
+      innerUrl.searchParams.set('inner', '1');
+      frame.src = innerUrl;
+      frame.addEventListener('load', () => frame.contentWindow.requestAnimationFrame(() => frame.contentWindow.requestAnimationFrame(() => collect(frame.contentWindow, frame.contentDocument))));
+      document.body.append(frame);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><title>Delayed translation contract</title></head>
+<body>
+  <select id="next-language"><option value="de" selected>DE</option></select>
+  <main id="next-view">
+    <article class="news-card" data-article-id="delayed-1" data-source-language="en" data-article-fingerprint="fp-1">
+      <h3>Original title</h3>
+      <button class="translate-card" type="button">Übersetzen</button>
+      <div class="card-actions"></div>
+    </article>
+  </main>
+  <dialog id="next-article-dialog"></dialog>
+  <script src="../website-language-origin.js?release=2"></script>
+  <script src="../website-translation-state.js?release=1"></script>
+  <script src="../website-translation-queue.js?release=3"></script>
+  <script>
+    document.querySelector('.translate-card').addEventListener('click', event => {
+      const button = event.currentTarget;
+      const card = button.closest('.news-card');
+      button.setAttribute('aria-busy', 'true');
+      setTimeout(() => {
+        card.dataset.translationState = 'done';
+        card.dataset.translationLanguage = 'de';
+        card.dataset.translationFingerprint = 'fp-1';
+        const note = card.querySelector('.translation-note') || document.createElement('small');
+        note.classList.add('translation-note');
+        note.dataset.machineTranslation = 'true';
+        note.textContent = 'Base translation completed';
+        if (!note.isConnected) card.querySelector('.card-actions').before(note);
+        button.removeAttribute('aria-busy');
+      }, 650);
+    });
+  </script>
+  <script src="../website-auto-translate.js?release=9"></script>
+</body>
+</html>

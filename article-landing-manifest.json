@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "sitemap": "/sitemap.xml",
+  "articlePathPattern": "^/articles/(wrn-[a-z0-9]+-[a-z0-9]+)/?$",
+  "fallback": "/?article={id}"
+}

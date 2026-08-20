@@ -1,0 +1,82 @@
+# Operating systems
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editors and local workspace state
+.idea/
+.vscode/
+*.code-workspace
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+*~
+
+# Logs and diagnostics
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+debug.log
+logs/
+.chrome-*/
+.cua-*/
+
+# Dependencies, caches and temporary output
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+.cache/
+.parcel-cache/
+.eslintcache
+coverage/
+.nyc_output/
+.tmp/
+tmp/
+temp/
+qa-*/.tmp/
+qa-*/profiles/
+qa-*/artifacts/
+
+# Python local state used by simple tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Secrets and signing material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Release archives and local deployment/rollback copies
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*-package/
+public_html-pre-*/
+public_html-pre-*.zip
+
+# Git merge and patch leftovers
+*.orig
+*.rej
+
