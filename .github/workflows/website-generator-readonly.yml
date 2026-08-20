@@ -1,0 +1,60 @@
+name: Website generator read-only CI
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generator-read-only:
+    name: Validate generator without repository writes
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository without credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check Node.js syntax
+        run: |
+          node --check tools/generate-article-landings.mjs
+          node --check qa-generator/article-generator.test.mjs
+
+      - name: Capture clean 935-page baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          article_count="$(find articles -mindepth 2 -maxdepth 2 -type f -name index.html | wc -l | tr -d ' ')"
+          test "$article_count" -eq 935
+          find articles -type f -print0 | sort -z | xargs -0 sha256sum > "$RUNNER_TEMP/articles.before.sha256"
+          sha256sum article-landing-manifest.json sitemap.xml > "$RUNNER_TEMP/metadata.before.sha256"
+
+      - name: Run focused generator tests
+        run: node --test qa-generator/article-generator.test.mjs
+
+      - name: Run generator in read-only check mode
+        run: node tools/generate-article-landings.mjs --check > "$RUNNER_TEMP/article-generator-report.json"
+
+      - name: Prove repository and 935 pages are unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          article_count="$(find articles -mindepth 2 -maxdepth 2 -type f -name index.html | wc -l | tr -d ' ')"
+          test "$article_count" -eq 935
+          find articles -type f -print0 | sort -z | xargs -0 sha256sum > "$RUNNER_TEMP/articles.after.sha256"
+          sha256sum article-landing-manifest.json sitemap.xml > "$RUNNER_TEMP/metadata.after.sha256"
+          diff -u "$RUNNER_TEMP/articles.before.sha256" "$RUNNER_TEMP/articles.after.sha256"
+          diff -u "$RUNNER_TEMP/metadata.before.sha256" "$RUNNER_TEMP/metadata.after.sha256"
+          git diff --exit-code
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
