@@ -1,9 +1,9 @@
-/* World Revolution News – Offline Service Worker · News App 2 release 2026-08-11 */
+/* World Revolution News – Offline Service Worker · News App 2 release 2026-09-27 */
 'use strict';
 
-const APP_CACHE = 'wrn-web-portal-2026-08-20-r10n-r45';
-const DATA_CACHE = 'wrn-web-data-2026-08-20-r10n-r45';
-const WRN_CACHE_PREFIX = 'wrn-';
+const APP_CACHE = 'wrn-web-portal-2026-09-27-r46';
+const DATA_CACHE = 'wrn-web-data-2026-09-27-r46';
+const MANAGED_CACHE_PREFIXES = ['wrn-web-portal-', 'wrn-web-data-'];
 
 const APP_SHELL = [
   './',
@@ -34,9 +34,9 @@ const APP_SHELL = [
   './prisoner-solidarity.css?release=2',
   './zine-designer.css?release=5',
   './source-verification.css?release=1',
-  './news-app-2-website.css?release=37',
+  './news-app-2-website.css?release=38',
   './article-landing.css?release=1',
-  './news-app-2-config.js?release=13',
+  './news-app-2-config.js?release=14',
   './native-device-bridge.js?release=2',
   './offline-db.js?release=2',
   './news-app-2-core.js?release=6',
@@ -59,11 +59,10 @@ const APP_SHELL = [
   './website-language-origin.js?release=3',
   './website-editorial-text.js?release=3',
   './website-portal-core.js?release=6',
-  './news-app-2.js?release=49-web16',
+  './news-app-2.js?release=50-web17',
   './news-app-2-website.js?release=24',
   './website-translation-state.js?release=1',
   './website-translation-queue.js?release=3',
-  './website-auto-translate.js?release=10',
   './website-link-security.js?release=1'
 ];
 
@@ -180,7 +179,7 @@ self.addEventListener('activate', event => {
     await Promise.all(
       cacheNames
         .filter(name =>
-          name.startsWith(WRN_CACHE_PREFIX)
+          MANAGED_CACHE_PREFIXES.some(prefix => name.startsWith(prefix))
           && !keep.has(name)
         )
         .map(name => caches.delete(name))
