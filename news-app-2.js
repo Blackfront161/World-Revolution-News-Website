@@ -850,47 +850,47 @@
     de: {
       shareApp:'App weiterempfehlen',
       shareAppNote:'Die App darf gerne verbreitet werden – danke für deine Unterstützung.',
-      shareAppText:'Ich empfehle dir World Revolution News – unabhängige, mehrsprachige Nachrichten aus Bewegungen und sozialen Kämpfen.'
+      shareAppText:'Ich empfehle dir World Revolution News – Nachrichten, Medien und Termine in mehreren Sprachen.'
     },
     en: {
       shareApp:'Recommend the app',
       shareAppNote:'Please feel free to share the app – thank you for your support.',
-      shareAppText:'I recommend World Revolution News – independent, multilingual news from movements and social struggles.'
+      shareAppText:'I recommend World Revolution News – news, media and events in several languages.'
     },
     es: {
       shareApp:'Recomendar la aplicación',
       shareAppNote:'Puedes compartir la aplicación libremente. Gracias por tu apoyo.',
-      shareAppText:'Te recomiendo World Revolution News: noticias independientes y multilingües de movimientos y luchas sociales.'
+      shareAppText:'Te recomiendo World Revolution News: noticias, medios y eventos en varios idiomas.'
     },
     fr: {
       shareApp:'Recommander l’application',
       shareAppNote:'N’hésitez pas à partager l’application. Merci pour votre soutien.',
-      shareAppText:'Je vous recommande World Revolution News : des informations indépendantes et multilingues sur les mouvements et les luttes sociales.'
+      shareAppText:'Je vous recommande World Revolution News : actualités, médias et événements en plusieurs langues.'
     },
     it: {
       shareApp:'Consiglia l’app',
       shareAppNote:'Condividi pure l’app. Grazie per il tuo sostegno.',
-      shareAppText:'Ti consiglio World Revolution News: notizie indipendenti e multilingue da movimenti e lotte sociali.'
+      shareAppText:'Ti consiglio World Revolution News: notizie, media ed eventi in più lingue.'
     },
     pt: {
       shareApp:'Recomendar a aplicação',
       shareAppNote:'Podes partilhar a aplicação livremente. Obrigado pelo teu apoio.',
-      shareAppText:'Recomendo a World Revolution News: notícias independentes e multilingues de movimentos e lutas sociais.'
+      shareAppText:'Recomendo a World Revolution News: notícias, conteúdos multimédia e eventos em várias línguas.'
     },
     ru: {
       shareApp:'Рекомендовать приложение',
       shareAppNote:'Приложением можно свободно делиться. Спасибо за поддержку.',
-      shareAppText:'Рекомендую World Revolution News — независимые многоязычные новости о движениях и социальной борьбе.'
+      shareAppText:'Рекомендую World Revolution News — новости, медиа и события на разных языках.'
     },
     el: {
       shareApp:'Προτείνετε την εφαρμογή',
       shareAppNote:'Μπορείτε ελεύθερα να μοιραστείτε την εφαρμογή. Ευχαριστούμε για την υποστήριξη.',
-      shareAppText:'Σας προτείνω το World Revolution News — ανεξάρτητες, πολύγλωσσες ειδήσεις από κινήματα και κοινωνικούς αγώνες.'
+      shareAppText:'Σας προτείνω το World Revolution News — ειδήσεις, μέσα και εκδηλώσεις σε πολλές γλώσσες.'
     },
     tr: {
       shareApp:'Uygulamayı öner',
       shareAppNote:'Uygulamayı özgürce paylaşabilirsiniz. Desteğiniz için teşekkür ederiz.',
-      shareAppText:'World Revolution News’u öneriyorum: hareketlerden ve toplumsal mücadelelerden bağımsız, çok dilli haberler.'
+      shareAppText:'World Revolution News’u öneriyorum: birçok dilde haberler, medya ve etkinlikler.'
     }
   };
 
@@ -1288,7 +1288,7 @@
       reportWrong:'Falsche Bedeutung', reportMissing:'Text fehlt', reportNames:'Namen oder Begriffe',
       reportOther:'Anderes', reportNote:'Hinweis (optional)', prepareEmail:'E-Mail vorbereiten',
       translatingPart:'Übersetze Abschnitt', translationComplete:'Vollständiger Artikel übersetzt.',
-      aboutTitle:'Über World Revolution News', aboutIntro:'Unabhängige, mehrsprachige Nachrichten aus Bewegungen und sozialen Kämpfen – ohne Konto, Tracking oder personalisierte Werbung.',
+      aboutTitle:'Über World Revolution News', aboutIntro:'Mehrsprachige Nachrichten, Medien und Termine – ohne Konto, Tracking oder personalisierte Werbung.',
       aboutPrinciples:'Die neue App verbindet aktuelle Meldungen, transparente Quellen, Übersetzungen, Audio, Termine, Lexikon, Solidarität und Zine-Werkzeuge in einer einhändig bedienbaren Oberfläche.',
       previewIsolation:'Diese Release-Kandidatin ist weiterhin von der veröffentlichten App getrennt.',
       statusOnline:'Verbindung', statusData:'Nachrichten geladen', statusEvents:'Termine geladen',
@@ -1338,7 +1338,7 @@
       reportWrong:'Wrong meaning', reportMissing:'Missing text', reportNames:'Names or terms',
       reportOther:'Other', reportNote:'Note (optional)', prepareEmail:'Prepare email',
       translatingPart:'Translating section', translationComplete:'Full article translated.',
-      aboutTitle:'About World Revolution News', aboutIntro:'Independent multilingual news from movements and social struggles, without accounts, tracking or personalized ads.',
+      aboutTitle:'About World Revolution News', aboutIntro:'Multilingual news, media and events without accounts, tracking or personalized ads.',
       aboutPrinciples:'The new app combines current news, transparent sources, translations, audio, events, a glossary, solidarity and Zine tools in a one-thumb interface.',
       previewIsolation:'This release candidate remains isolated from the published app.',
       statusOnline:'Connection', statusData:'News loaded', statusEvents:'Events loaded',
@@ -1383,7 +1383,7 @@
       reportWrong:'Significado incorrecto', reportMissing:'Falta texto', reportNames:'Nombres o términos',
       reportOther:'Otro', reportNote:'Nota (opcional)', prepareEmail:'Preparar correo',
       translatingPart:'Traduciendo sección', translationComplete:'Artículo completo traducido.',
-      aboutTitle:'Acerca de World Revolution News', aboutIntro:'Noticias independientes y multilingües de movimientos y luchas sociales, sin cuentas, seguimiento ni publicidad personalizada.',
+      aboutTitle:'Acerca de World Revolution News', aboutIntro:'Noticias, medios y eventos en varios idiomas, sin cuentas, seguimiento ni publicidad personalizada.',
       aboutPrinciples:'La nueva aplicación reúne noticias actuales, fuentes transparentes, traducciones, audio, eventos, glosario, solidaridad y herramientas Zine en una interfaz manejable con una mano.',
       previewIsolation:'Esta versión candidata sigue separada de la aplicación publicada.',
       statusOnline:'Conexión', statusData:'Noticias cargadas', statusEvents:'Eventos cargados',
@@ -1428,7 +1428,7 @@
       reportWrong:'Sens incorrect', reportMissing:'Texte manquant', reportNames:'Noms ou termes',
       reportOther:'Autre', reportNote:'Note (facultative)', prepareEmail:'Préparer l’e-mail',
       translatingPart:'Traduction de la section', translationComplete:'Article complet traduit.',
-      aboutTitle:'À propos de World Revolution News', aboutIntro:'Actualités indépendantes et multilingues issues des mouvements et des luttes sociales, sans compte, suivi ni publicité personnalisée.',
+      aboutTitle:'À propos de World Revolution News', aboutIntro:'Actualités, médias et événements en plusieurs langues, sans compte, suivi ni publicité personnalisée.',
       aboutPrinciples:'La nouvelle application réunit actualités, sources transparentes, traductions, audio, événements, lexique, solidarité et outils Zine dans une interface utilisable d’une seule main.',
       previewIsolation:'Cette version candidate reste séparée de l’application publiée.',
       statusOnline:'Connexion', statusData:'Actualités chargées', statusEvents:'Événements chargés',
@@ -1473,7 +1473,7 @@
       reportWrong:'Significato errato', reportMissing:'Testo mancante', reportNames:'Nomi o termini',
       reportOther:'Altro', reportNote:'Nota (facoltativa)', prepareEmail:'Prepara e-mail',
       translatingPart:'Traduzione della sezione', translationComplete:'Articolo completo tradotto.',
-      aboutTitle:'Informazioni su World Revolution News', aboutIntro:'Notizie indipendenti e multilingue da movimenti e lotte sociali, senza account, tracciamento o pubblicità personalizzata.',
+      aboutTitle:'Informazioni su World Revolution News', aboutIntro:'Notizie, media ed eventi in più lingue, senza account, tracciamento o pubblicità personalizzata.',
       aboutPrinciples:'La nuova app riunisce notizie attuali, fonti trasparenti, traduzioni, audio, eventi, glossario, solidarietà e strumenti Zine in un’interfaccia utilizzabile con una mano.',
       previewIsolation:'Questa versione candidata resta separata dall’app pubblicata.',
       statusOnline:'Connessione', statusData:'Notizie caricate', statusEvents:'Eventi caricati',
@@ -1518,7 +1518,7 @@
       reportWrong:'Significado incorreto', reportMissing:'Texto em falta', reportNames:'Nomes ou termos',
       reportOther:'Outro', reportNote:'Nota (opcional)', prepareEmail:'Preparar e-mail',
       translatingPart:'A traduzir secção', translationComplete:'Artigo completo traduzido.',
-      aboutTitle:'Sobre o World Revolution News', aboutIntro:'Notícias independentes e multilingues de movimentos e lutas sociais, sem contas, rastreio ou publicidade personalizada.',
+      aboutTitle:'Sobre o World Revolution News', aboutIntro:'Notícias, conteúdos multimédia e eventos em várias línguas, sem contas, rastreio ou publicidade personalizada.',
       aboutPrinciples:'A nova aplicação reúne notícias atuais, fontes transparentes, traduções, áudio, eventos, glossário, solidariedade e ferramentas Zine numa interface utilizável com uma mão.',
       previewIsolation:'Esta versão candidata continua separada da aplicação publicada.',
       statusOnline:'Ligação', statusData:'Notícias carregadas', statusEvents:'Eventos carregados',
@@ -1563,7 +1563,7 @@
       reportWrong:'Неверный смысл', reportMissing:'Отсутствует текст', reportNames:'Имена или термины',
       reportOther:'Другое', reportNote:'Примечание (необязательно)', prepareEmail:'Подготовить письмо',
       translatingPart:'Перевод раздела', translationComplete:'Полная статья переведена.',
-      aboutTitle:'О World Revolution News', aboutIntro:'Независимые многоязычные новости движений и социальной борьбы без аккаунтов, отслеживания и персонализированной рекламы.',
+      aboutTitle:'О World Revolution News', aboutIntro:'Новости, медиа и события на разных языках без аккаунтов, отслеживания и персонализированной рекламы.',
       aboutPrinciples:'Новое приложение объединяет актуальные новости, прозрачные источники, переводы, аудио, события, словарь, солидарность и инструменты Zine в интерфейсе для управления одной рукой.',
       previewIsolation:'Эта версия-кандидат по-прежнему отделена от опубликованного приложения.',
       statusOnline:'Соединение', statusData:'Новостей загружено', statusEvents:'Событий загружено',
@@ -1608,7 +1608,7 @@
       reportWrong:'Λανθασμένο νόημα', reportMissing:'Λείπει κείμενο', reportNames:'Ονόματα ή όροι',
       reportOther:'Άλλο', reportNote:'Σημείωση (προαιρετικά)', prepareEmail:'Προετοιμασία email',
       translatingPart:'Μετάφραση ενότητας', translationComplete:'Μεταφράστηκε ολόκληρο το άρθρο.',
-      aboutTitle:'Σχετικά με το World Revolution News', aboutIntro:'Ανεξάρτητες, πολύγλωσσες ειδήσεις από κινήματα και κοινωνικούς αγώνες, χωρίς λογαριασμούς, παρακολούθηση ή εξατομικευμένες διαφημίσεις.',
+      aboutTitle:'Σχετικά με το World Revolution News', aboutIntro:'Ειδήσεις, μέσα και εκδηλώσεις σε πολλές γλώσσες, χωρίς λογαριασμούς, παρακολούθηση ή εξατομικευμένες διαφημίσεις.',
       aboutPrinciples:'Η νέα εφαρμογή συνδυάζει τρέχουσες ειδήσεις, διαφανείς πηγές, μεταφράσεις, ήχο, εκδηλώσεις, λεξικό, αλληλεγγύη και εργαλεία Zine σε διεπαφή για χρήση με ένα χέρι.',
       previewIsolation:'Αυτή η υποψήφια έκδοση παραμένει χωριστή από τη δημοσιευμένη εφαρμογή.',
       statusOnline:'Σύνδεση', statusData:'Ειδήσεις που φορτώθηκαν', statusEvents:'Εκδηλώσεις που φορτώθηκαν',
@@ -1653,7 +1653,7 @@
       reportWrong:'Yanlış anlam', reportMissing:'Eksik metin', reportNames:'Adlar veya terimler',
       reportOther:'Diğer', reportNote:'Not (isteğe bağlı)', prepareEmail:'E-posta hazırla',
       translatingPart:'Bölüm çevriliyor', translationComplete:'Makalenin tamamı çevrildi.',
-      aboutTitle:'World Revolution News hakkında', aboutIntro:'Hesap, takip veya kişiselleştirilmiş reklam olmadan hareketlerden ve toplumsal mücadelelerden bağımsız, çok dilli haberler.',
+      aboutTitle:'World Revolution News hakkında', aboutIntro:'Hesap, takip veya kişiselleştirilmiş reklam olmadan birçok dilde haberler, medya ve etkinlikler.',
       aboutPrinciples:'Yeni uygulama güncel haberleri, şeffaf kaynakları, çevirileri, sesi, etkinlikleri, sözlüğü, dayanışmayı ve Zine araçlarını tek elle kullanılabilen bir arayüzde birleştirir.',
       previewIsolation:'Bu sürüm adayı yayımlanmış uygulamadan ayrı kalmaya devam eder.',
       statusOnline:'Bağlantı', statusData:'Yüklenen haberler', statusEvents:'Yüklenen etkinlikler',

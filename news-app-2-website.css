@@ -2193,13 +2193,6 @@
 }
 
 /* Editorial front page: one lead, five complete compact headlines and sport. */
-:root.website-portal:not([data-theme="light"]):not([data-theme="contrast"]):not([data-theme="pink"]) {
-  --cyan:#aa86ff;
-  --cyan-soft:rgba(170,134,255,.15);
-  --cyan-border:rgba(170,134,255,.52);
-  --red:#ff4863;
-  --red-soft:rgba(255,72,99,.16);
-}
 .website-portal body {
   background:
     radial-gradient(circle at 83% 9%,color-mix(in srgb,var(--red) 11%,transparent),transparent 32rem),
