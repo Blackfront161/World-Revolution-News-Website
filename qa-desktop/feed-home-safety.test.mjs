@@ -32,6 +32,8 @@ test('service worker upgrade keeps saved articles and unrelated caches', async (
     'wrn-web-data-2026-08-20-r10n-r45',
     'wrn-web-portal-2026-09-27-r46',
     'wrn-web-data-2026-09-27-r46',
+    'wrn-web-portal-2026-09-27-r47',
+    'wrn-web-data-2026-09-27-r47',
     'wrn-saved-articles-v1',
     'another-site-cache'
   ];
@@ -48,7 +50,7 @@ test('service worker upgrade keeps saved articles and unrelated caches', async (
   let work;
   events.get('activate')({ waitUntil: value => { work = value; } });
   await work;
-  assert.deepEqual(deleted.sort(), existing.slice(0, 2).sort());
+  assert.deepEqual(deleted.sort(), existing.slice(0, 4).sort());
 });
 
 test('offline navigation and feed use previously cached responses', async () => {

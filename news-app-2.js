@@ -380,8 +380,7 @@
       openLocalPreview: 'Lokale Vorschau öffnen',
       selectionSaved: 'Deine Auswahl wurde lokal gespeichert.', articleSaved: 'Artikel gespeichert.',
       articleRemoved: 'Artikel entfernt.', translatedTitle: 'Übersetzter Titel und Einleitung',
-      previewNotice: 'Parallele Vorschau – die veröffentlichte App bleibt unverändert.',
-      liveNotice: 'Unabhängige Nachrichten aus Bewegungen und sozialen Kämpfen.'
+      previewNotice: 'Parallele Vorschau – die veröffentlichte App bleibt unverändert.'
     },
     en: {
       preview: 'News App 2 · Preview', language: 'Language', classic: 'Current app',
@@ -419,8 +418,7 @@
       openLocalPreview: 'Open local preview',
       selectionSaved: 'Your selection was saved locally.', articleSaved: 'Article saved.',
       articleRemoved: 'Article removed.', translatedTitle: 'Translated title and introduction',
-      previewNotice: 'Parallel preview – the published app remains unchanged.',
-      liveNotice: 'Independent news from movements and social struggles.'
+      previewNotice: 'Parallel preview – the published app remains unchanged.'
     },
     es: {
       preview:'News App 2 · Vista previa', language:'Idioma', classic:'Aplicación actual', searchLabel:'Buscar noticias', search:'Buscar',
@@ -447,8 +445,7 @@
       menuSearch:'Abrir búsqueda', close:'Cerrar', selectionSaved:'Selección guardada localmente.',
       fileModeTitle:'La vista previa se abrió como archivo.', fileModeText:'Las fuentes de noticias no pueden cargarse en modo file://. Abre la vista previa mediante el servidor de prueba local.', openLocalPreview:'Abrir vista previa local',
       articleSaved:'Artículo guardado.', articleRemoved:'Artículo eliminado.', translatedTitle:'Título e introducción traducidos',
-      previewNotice:'Vista previa paralela: la aplicación publicada no cambia.',
-      liveNotice:'Noticias independientes de movimientos y luchas sociales.'
+      previewNotice:'Vista previa paralela: la aplicación publicada no cambia.'
     },
     fr: {
       preview:'News App 2 · Aperçu', language:'Langue', classic:'Application actuelle', searchLabel:'Rechercher des actualités', search:'Rechercher',
@@ -475,8 +472,7 @@
       menuSearch:'Ouvrir la recherche', close:'Fermer', selectionSaved:'Sélection enregistrée localement.',
       fileModeTitle:'L’aperçu a été ouvert comme fichier.', fileModeText:'Les flux d’actualités ne peuvent pas être chargés en mode file://. Ouvrez l’aperçu avec le serveur de test local.', openLocalPreview:'Ouvrir l’aperçu local',
       articleSaved:'Article enregistré.', articleRemoved:'Article supprimé.', translatedTitle:'Titre et introduction traduits',
-      previewNotice:'Aperçu parallèle – l’application publiée reste inchangée.',
-      liveNotice:'Actualités indépendantes des mouvements et des luttes sociales.'
+      previewNotice:'Aperçu parallèle – l’application publiée reste inchangée.'
     },
     it: {
       preview:'News App 2 · Anteprima', language:'Lingua', classic:'App attuale', searchLabel:'Cerca notizie', search:'Cerca',
@@ -503,8 +499,7 @@
       menuSearch:'Apri ricerca', close:'Chiudi', selectionSaved:'Selezione salvata localmente.',
       fileModeTitle:'L’anteprima è stata aperta come file.', fileModeText:'I feed delle notizie non possono essere caricati in modalità file://. Apri l’anteprima tramite il server di prova locale.', openLocalPreview:'Apri anteprima locale',
       articleSaved:'Articolo salvato.', articleRemoved:'Articolo rimosso.', translatedTitle:'Titolo e introduzione tradotti',
-      previewNotice:'Anteprima parallela: l’app pubblicata non cambia.',
-      liveNotice:'Notizie indipendenti da movimenti e lotte sociali.'
+      previewNotice:'Anteprima parallela: l’app pubblicata non cambia.'
     },
     pt: {
       preview:'News App 2 · Pré-visualização', language:'Idioma', classic:'Aplicação atual', searchLabel:'Pesquisar notícias', search:'Pesquisar',
@@ -531,8 +526,7 @@
       menuSearch:'Abrir pesquisa', close:'Fechar', selectionSaved:'Seleção guardada localmente.',
       fileModeTitle:'A pré-visualização foi aberta como ficheiro.', fileModeText:'Os feeds de notícias não podem ser carregados no modo file://. Abre a pré-visualização através do servidor de teste local.', openLocalPreview:'Abrir pré-visualização local',
       articleSaved:'Artigo guardado.', articleRemoved:'Artigo removido.', translatedTitle:'Título e introdução traduzidos',
-      previewNotice:'Pré-visualização paralela: a aplicação publicada não muda.',
-      liveNotice:'Notícias independentes de movimentos e lutas sociais.'
+      previewNotice:'Pré-visualização paralela: a aplicação publicada não muda.'
     },
     ru: {
       preview:'News App 2 · Предпросмотр', language:'Язык', classic:'Текущее приложение', searchLabel:'Поиск новостей', search:'Поиск',
@@ -559,8 +553,7 @@
       menuSearch:'Открыть поиск', close:'Закрыть', selectionSaved:'Выбор сохранён локально.',
       fileModeTitle:'Предпросмотр открыт как файл.', fileModeText:'Новостные ленты нельзя загрузить в режиме file://. Откройте предпросмотр через локальный тестовый сервер.', openLocalPreview:'Открыть локальный предпросмотр',
       articleSaved:'Статья сохранена.', articleRemoved:'Статья удалена.', translatedTitle:'Переведённые заголовок и введение',
-      previewNotice:'Параллельный предпросмотр — опубликованное приложение не меняется.',
-      liveNotice:'Независимые новости движений и социальной борьбы.'
+      previewNotice:'Параллельный предпросмотр — опубликованное приложение не меняется.'
     },
     el: {
       preview:'News App 2 · Προεπισκόπηση', language:'Γλώσσα', classic:'Τρέχουσα εφαρμογή', searchLabel:'Αναζήτηση ειδήσεων', search:'Αναζήτηση',
@@ -587,8 +580,7 @@
       menuSearch:'Άνοιγμα αναζήτησης', close:'Κλείσιμο', selectionSaved:'Η επιλογή αποθηκεύτηκε τοπικά.',
       fileModeTitle:'Η προεπισκόπηση ανοίχτηκε ως αρχείο.', fileModeText:'Οι ροές ειδήσεων δεν φορτώνονται σε λειτουργία file://. Ανοίξτε την προεπισκόπηση μέσω του τοπικού διακομιστή δοκιμών.', openLocalPreview:'Άνοιγμα τοπικής προεπισκόπησης',
       articleSaved:'Το άρθρο αποθηκεύτηκε.', articleRemoved:'Το άρθρο αφαιρέθηκε.', translatedTitle:'Μεταφρασμένος τίτλος και εισαγωγή',
-      previewNotice:'Παράλληλη προεπισκόπηση — η δημοσιευμένη εφαρμογή δεν αλλάζει.',
-      liveNotice:'Ανεξάρτητες ειδήσεις από κινήματα και κοινωνικούς αγώνες.'
+      previewNotice:'Παράλληλη προεπισκόπηση — η δημοσιευμένη εφαρμογή δεν αλλάζει.'
     },
     tr: {
       preview:'News App 2 · Önizleme', language:'Dil', classic:'Mevcut uygulama', searchLabel:'Haberlerde ara', search:'Ara',
@@ -615,8 +607,7 @@
       menuSearch:'Aramayı aç', close:'Kapat', selectionSaved:'Seçimin yerel olarak kaydedildi.',
       fileModeTitle:'Önizleme dosya olarak açıldı.', fileModeText:'Haber akışları file:// modunda yüklenemez. Önizlemeyi yerel test sunucusu üzerinden açın.', openLocalPreview:'Yerel önizlemeyi aç',
       articleSaved:'Haber kaydedildi.', articleRemoved:'Haber kaldırıldı.', translatedTitle:'Çevrilmiş başlık ve giriş',
-      previewNotice:'Paralel önizleme — yayımlanmış uygulama değişmez.',
-      liveNotice:'Hareketlerden ve toplumsal mücadelelerden bağımsız haberler.'
+      previewNotice:'Paralel önizleme — yayımlanmış uygulama değişmez.'
     }
   };
 
@@ -2123,9 +2114,6 @@
 
   function t(key) {
     if (isProduction && key === 'preview') return 'World Revolution News';
-    if (isProduction && key === 'previewNotice') {
-      return COPY[state.language]?.liveNotice || COPY.en.liveNotice;
-    }
     return RELEASE_COPY[state.language]?.[key]
       || RELEASE_COPY.en[key]
       || ARTICLE_COPY[state.language]?.[key]
@@ -4097,12 +4085,15 @@
     const heroImage = hero.image
       ? `<div class="home-hero__image" data-optional-image><img src="${escapeHtml(hero.image)}" alt="" decoding="async" fetchpriority="high" sizes="(max-width: 820px) calc(100vw - 18px), 45vw" referrerpolicy="no-referrer"></div>`
       : '';
+    const previewNotice = !isProduction
+      ? `<span class="tag">${escapeHtml(t('previewNotice'))}</span>`
+      : '';
+    const snapshotAction = state.dataStatus.mode === 'snapshot'
+      ? `<button class="tag data-status-action" type="button" data-action="live-data">${escapeHtml(t('openLiveData'))} →</button>`
+      : '';
 
     viewRoot.innerHTML = `
-      <div class="meta-line">
-        <span class="tag">${escapeHtml(t('previewNotice'))}</span>
-        ${state.dataStatus.mode === 'snapshot' ? `<button class="tag data-status-action" type="button" data-action="live-data">${escapeHtml(t('openLiveData'))} →</button>` : ''}
-      </div>
+      ${previewNotice || snapshotAction ? `<div class="meta-line">${previewNotice}${snapshotAction}</div>` : ''}
       <div class="section-heading"><span class="section-heading-title">${escapeHtml(t('latest'))}</span><small>${selected.length}</small></div>
       <div class="home-lead-grid"><article class="home-hero" data-article-id="${escapeHtml(websiteArticleId(hero))}" data-source-language="${escapeHtml(sourceLanguageCode(hero))}" data-article-fingerprint="${escapeHtml(articleTranslationFingerprint(hero))}"${heroTranslation ? ` data-translation-state="cached" data-translation-language="${escapeHtml(state.language)}" data-translation-fingerprint="${escapeHtml(heroTranslation.fingerprint)}"` : ''}>
         ${heroImage}
