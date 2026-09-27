@@ -33,7 +33,7 @@ window.WRN_CONFIG = Object.freeze({
       ? 'branch-snapshot'
       : 'live-readonly-with-offline-fallback',
   dataUrls: Object.freeze({
-    feedStatus: '',
+    feedStatus: wrnDataUrl('feed-status.json'),
     newsFeed: wrnDataUrl('news-feed.json'),
     news: wrnDataUrl('news.json'),
     newsArchiveManifest: wrnDataUrl('news-archive-manifest.json'),
@@ -58,7 +58,7 @@ window.WRN_CONFIG = Object.freeze({
     editorialDecisions: ''
   }),
   dataMirrors: Object.freeze({
-    feedStatus: '',
+    feedStatus: wrnMirrorDataUrl('feed-status.json'),
     newsFeed: wrnMirrorDataUrl('news-feed.json'),
     news: wrnMirrorDataUrl('news.json'),
     newsArchiveManifest: wrnMirrorDataUrl('news-archive-manifest.json'),

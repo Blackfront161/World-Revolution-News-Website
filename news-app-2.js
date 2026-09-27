@@ -1962,7 +1962,7 @@
       viewMode: ['cards', 'compact', 'headlines'].includes(storedDiscoverFilters.viewMode) ? storedDiscoverFilters.viewMode : 'cards'
     },
     sourceArchive: {
-      manifest: null, manifestLoading: false, manifestFailed: false,
+      manifest: null, manifestLoading: false, manifestFailed: false, manifestEpoch: 0,
       selectedSources: storedArchiveSources, loadedSources: new Set(), failedSources: new Set(),
       loadingSources: new Set(), sourceQuery: ''
     },
@@ -3620,7 +3620,8 @@
     const names = await caches.keys();
     await Promise.all(
       names
-        .filter(name => name.startsWith('wrn-news-app-2-') || name === 'wrn-saved-articles-v1')
+        .filter(name => ['wrn-news-app-2-', 'wrn-web-portal-', 'wrn-web-data-']
+          .some(prefix => name.startsWith(prefix)))
         .map(name => caches.delete(name))
     );
   }
@@ -3628,26 +3629,37 @@
   async function clearLocalData(category) {
     if (category === 'reading') {
       if (!window.confirm(t('clearReadingConfirm'))) return;
-      [BOOKMARKS_KEY, READ_KEY, READING_POSITIONS_KEY, ZINE_KEY, VIDEO_WATCH_LATER_KEY, VIDEO_HISTORY_KEY, BRIEFING_HISTORY_KEY].forEach(key => localStorage.removeItem(key));
-      state.videoWatchLater = [];
-      state.videoHistory = [];
-      state.briefingHistory = [];
+      [BOOKMARKS_KEY, READ_KEY, READING_POSITIONS_KEY, ZINE_KEY].forEach(key => localStorage.removeItem(key));
       await window.WRNStorage?.putDataset?.('news-app-2-saved-articles', []);
       if ('caches' in window) await caches.delete('wrn-saved-articles-v1');
+      state.savedArticles = [];
     } else if (category === 'offline') {
       if (!window.confirm(t('clearOfflineConfirm'))) return;
       await clearPreviewCaches();
-      await window.WRNStorage?.clearAll?.();
     } else {
       if (!window.confirm(t('clearAllConfirm'))) return;
+      await disconnectPushSubscription();
       [...Array(localStorage.length)].map((_, index) => localStorage.key(index))
         .filter(key => key?.startsWith('wrn_'))
         .forEach(key => localStorage.removeItem(key));
+      state.videoWatchLater = [];
+      state.videoHistory = [];
+      state.briefingHistory = [];
+      state.savedArticles = [];
+      state.translations = {};
+      state.preferences = normalizedPreferences({});
+      state.developmentWatch = [];
+      state.developmentReviews = [];
+      state.dailyEditionItems = [];
+      state.eventFilter.location = null;
+      state.eventFilter.radius = 0;
       await clearPreviewCaches();
+      if ('caches' in window) await caches.delete('wrn-saved-articles-v1');
       await window.WRNStorage?.clearAll?.();
     }
     showToast(t('selectedDataCleared'));
     renderDataControl();
+    if (state.view === 'saved') renderSaved();
   }
 
   async function renderSystemStatus() {
@@ -3770,21 +3782,24 @@
   function preferredHomeEvents() {
     const preferredRegions = [...new Set(state.preferences.regions || [])];
     const locationActive = Boolean(state.eventFilter.location && Number(state.eventFilter.radius));
+    const now = Date.now();
     let items = release.filterEvents(state.events, {
       archived: false,
       location: locationActive ? state.eventFilter.location : null,
       radius: locationActive ? state.eventFilter.radius : 0
-    });
+    }, now).filter(event => Number.isFinite(event.start) && Number.isFinite(event.end) && event.end >= now);
     if (!locationActive) items = eventsForRegions(items, preferredRegions);
     items.sort((first, second) => {
       if (locationActive) {
         const distance = (first.distanceKm ?? Infinity) - (second.distanceKm ?? Infinity);
         if (distance) return distance;
       }
-      return Number(first.start) - Number(second.start);
+      const firstNext = first.start >= now ? first.start : first.end;
+      const secondNext = second.start >= now ? second.start : second.end;
+      return firstNext - secondNext || first.start - second.start;
     });
     return {
-      items: items.slice(0, 2),
+      items: items.slice(0, 5),
       regions: locationActive ? [] : preferredRegions,
       context: locationActive
         ? `${t('nearMe')} · ${state.eventFilter.radius} km`
@@ -3813,6 +3828,13 @@
   function homeServiceMarkup(serviceData = homeServiceData()) {
     const { developments, homeEvents } = serviceData;
     if (!developments.length && !state.events.length) return '';
+    const eventHeading = ({
+      de: 'Aktuelle und kommende Termine', en: 'Current and upcoming events',
+      es: 'Eventos actuales y próximos', fr: 'Événements en cours et à venir',
+      it: 'Eventi in corso e futuri', pt: 'Eventos atuais e futuros',
+      ru: 'Текущие и предстоящие события', el: 'Τρέχουσες και επερχόμενες εκδηλώσεις',
+      tr: 'Devam eden ve yaklaşan etkinlikler'
+    })[state.language] || 'Current and upcoming events';
 
     return `
       <section class="home-service-grid" aria-label="${escapeHtml(`${t('developments')} · ${t('events')}`)}">
@@ -3828,8 +3850,8 @@
         </article>` : ''}
         ${state.events.length ? `<article class="home-service-card">
           <header>
-            <div><span class="eyebrow">${escapeHtml(homeEvents.context)}</span><h2>${escapeHtml(t('eventUpcoming'))}</h2></div>
-            <button type="button" class="home-service-link" data-action="home-events" aria-label="${escapeHtml(t('eventUpcoming'))}">→</button>
+            <div><span class="eyebrow">${escapeHtml(homeEvents.context)}</span><h2>${escapeHtml(eventHeading)}</h2></div>
+            <button type="button" class="home-service-link" data-action="home-events" aria-label="${escapeHtml(eventHeading)}">→</button>
           </header>
           ${homeEvents.items.length ? `<ol class="home-service-list">${homeEvents.items.map(event => `<li>
             <strong>${escapeHtml(translationFor(event)?.title || event.title)}</strong>
@@ -3983,31 +4005,90 @@
     </section>`;
   }
 
+  function homeSportsMarkup(items) {
+    const labels = {
+      de: ['Sport & Gesellschaft', 'Im aktuellen Feed gibt es noch keine geprüfte Sportmeldung.'],
+      en: ['Sport & society', 'There are no verified sports stories in the current feed yet.'],
+      es: ['Deporte y sociedad', 'Todavía no hay noticias deportivas verificadas en el feed actual.'],
+      fr: ['Sport et société', 'Le flux actuel ne contient pas encore d’article sportif vérifié.'],
+      it: ['Sport e società', 'Il feed attuale non contiene ancora notizie sportive verificate.'],
+      pt: ['Esporte e sociedade', 'Ainda não há notícias esportivas verificadas no feed atual.'],
+      ru: ['Спорт и общество', 'В текущей ленте пока нет проверенных спортивных новостей.'],
+      el: ['Αθλητισμός και κοινωνία', 'Η τρέχουσα ροή δεν περιέχει ακόμη επαληθευμένες αθλητικές ειδήσεις.'],
+      tr: ['Spor ve toplum', 'Güncel akışta henüz doğrulanmış spor haberi yok.']
+    };
+    const [heading, empty] = labels[state.language] || labels.en;
+    return `<section class="home-sports" aria-labelledby="home-sports-title">
+      <div class="home-sports__heading"><span aria-hidden="true">★</span><h2 id="home-sports-title">${escapeHtml(heading)}</h2></div>
+      ${items.length ? `<ul>${items.map(article => {
+        const cardIndex = state.cardArticles.push(article) - 1;
+        return `<li><button type="button" data-action="open" data-index="${cardIndex}" data-article-id="${escapeHtml(websiteArticleId(article))}">${article.image ? `<img src="${escapeHtml(article.image)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : ''}<span><strong>${escapeHtml(translationFor(article)?.title || article.title)}</strong><small>${escapeHtml(article.source)} · ${escapeHtml(dateLabel(article))}</small></span></button></li>`;
+      }).join('')}</ul>` : `<p>${escapeHtml(empty)}</p>`}
+    </section>`;
+  }
+
+  function isSportHeadline(article) {
+    return /\b(?:futbol|fútbol|fussball|football|soccer|basketball|volleyball|voleybol|tennis|cricket)\b/i
+      .test(String(article?.title || ''));
+  }
+
+  function homeHeadlineSentence(article) {
+    const translation = translationFor(article);
+    const firstSentence = window.WRNWebsiteEditorialText?.firstCompleteSentence;
+    return firstSentence?.(
+      translation?.intro || article.content,
+      translation ? state.language : (article.language || state.language),
+      { maxLength: 650 }
+    ) || firstSentence?.(
+      article.content,
+      article.language || state.language,
+      { maxLength: 650 }
+    ) || '';
+  }
+
   function renderHome() {
     state.cardArticles = [];
-    const balanced = core.balanceEditorially(state.articles, HOME_COUNT, {
+    const sportsItems = state.articles.filter(article =>
+      isSportHeadline(article) && core.isLeadEligible(article)
+    ).slice(0, 3);
+    const sportIds = new Set(sportsItems.map(article => article.id));
+    const generalArticles = state.articles.filter(article => !sportIds.has(article.id));
+    const balanced = core.balanceEditorially(generalArticles, HOME_COUNT, {
       maxPerFamily: 2,
       poolSize: 60
     });
     const hero = balanced.find(core.isLeadEligible)
-      || state.articles.find(core.isLeadEligible);
+      || generalArticles.find(core.isLeadEligible);
     if (!hero) return renderError();
     const selected = [hero, ...balanced.filter(article => article.id !== hero.id)]
       .slice(0, HOME_COUNT);
-    const briefingSeen = new Set();
-    const briefingItems = [...selected, ...state.articles]
-      .filter(article => {
-        if (!core.isLeadEligible(article) || briefingSeen.has(article.id)) return false;
-        briefingSeen.add(article.id);
-        return true;
-      })
-      .slice(0, 5);
+    const headlineSeen = new Set([hero.id]);
+    const headlineItems = [];
+    const headlineSentences = new Map();
+    for (const article of [...selected, ...generalArticles]) {
+      if (headlineItems.length === 5) break;
+      if (!article.image || !core.isLeadEligible(article) || headlineSeen.has(article.id)) continue;
+      headlineSeen.add(article.id);
+      const sentence = homeHeadlineSentence(article);
+      if (!sentence) continue;
+      headlineItems.push(article);
+      headlineSentences.set(article.id, sentence);
+    }
+    const visibleLeadIds = new Set([hero.id, ...headlineItems.map(article => article.id), ...sportIds]);
     const homeServices = homeServiceData();
-    const todayData = homeTodayData(briefingItems, homeServices);
+    const todayData = homeTodayData(headlineItems, homeServices);
     state.editorialQuality = core.editorialQuality(selected);
     viewRoot.dataset.sourceFamilies = String(state.editorialQuality.uniqueSourceFamilies);
     viewRoot.dataset.maxSourceStreak = String(state.editorialQuality.maxSourceStreak);
-    const homeGroups = personalizedHomeGroups(selected.slice(1), [hero.id]);
+    const homeGroups = personalizedHomeGroups(
+      selected.slice(1).filter(article => !visibleLeadIds.has(article.id)),
+      [...visibleLeadIds]
+    );
+    const headlineLabels = {
+      de: 'Hauptmeldungen', en: 'Top stories', es: 'Noticias destacadas',
+      fr: 'À la une', it: 'Notizie principali', pt: 'Notícias em destaque',
+      ru: 'Главные новости', el: 'Κύριες ειδήσεις', tr: 'Öne çıkan haberler'
+    };
 
     const heroIndex = state.cardArticles.push(hero) - 1;
     const heroTranslation = translationFor(hero);
@@ -4023,7 +4104,7 @@
         ${state.dataStatus.mode === 'snapshot' ? `<button class="tag data-status-action" type="button" data-action="live-data">${escapeHtml(t('openLiveData'))} →</button>` : ''}
       </div>
       <div class="section-heading"><span class="section-heading-title">${escapeHtml(t('latest'))}</span><small>${selected.length}</small></div>
-      <article class="home-hero" data-article-id="${escapeHtml(websiteArticleId(hero))}" data-source-language="${escapeHtml(sourceLanguageCode(hero))}" data-article-fingerprint="${escapeHtml(articleTranslationFingerprint(hero))}"${heroTranslation ? ` data-translation-state="cached" data-translation-language="${escapeHtml(state.language)}" data-translation-fingerprint="${escapeHtml(heroTranslation.fingerprint)}"` : ''}>
+      <div class="home-lead-grid"><article class="home-hero" data-article-id="${escapeHtml(websiteArticleId(hero))}" data-source-language="${escapeHtml(sourceLanguageCode(hero))}" data-article-fingerprint="${escapeHtml(articleTranslationFingerprint(hero))}"${heroTranslation ? ` data-translation-state="cached" data-translation-language="${escapeHtml(state.language)}" data-translation-fingerprint="${escapeHtml(heroTranslation.fingerprint)}"` : ''}>
         ${heroImage}
         <div class="home-hero__content">
           <span class="eyebrow">${escapeHtml(hero.source)} · ${escapeHtml(dateLabel(hero))}</span>
@@ -4042,19 +4123,19 @@
           </div>
         </div>
       </article>
-      <div class="section-heading briefing-heading">
-        <div><h2>${escapeHtml(t('briefing'))}</h2><small>${escapeHtml(t('briefingHint'))}</small></div>
-        <button class="secondary-button" type="button" data-action="briefing-open">${escapeHtml(t('briefingCreate'))}</button>
+      <aside class="home-headlines"><div class="section-heading home-headlines__heading">
+        <h2>${escapeHtml(headlineLabels[state.language] || headlineLabels.en)}</h2>
       </div>
-      <div class="briefing-strip">
-        ${briefingItems.map((article, index) => {
+      <div class="home-headlines__list">
+        ${headlineItems.map((article, index) => {
           const cardIndex = state.cardArticles.push(article) - 1;
-          const translation = translationFor(article);
-          const title = translation?.title || article.title;
-          const intro = editorialTeaser(translation?.intro, article.intro || core.excerpt(article.content, 230));
-          return `<button class="briefing-item" type="button" data-action="open" data-index="${cardIndex}" data-article-id="${escapeHtml(websiteArticleId(article))}" data-briefing-id="${escapeHtml(websiteArticleId(article))}"><b>${index + 1}</b><span class="briefing-item__copy"><strong>${escapeHtml(title)}</strong><small>${escapeHtml(intro)}</small></span></button>`;
+          const title = translationFor(article)?.title || article.title;
+          const firstSentence = headlineSentences.get(article.id);
+          return `<button class="home-headline" type="button" data-action="open" data-index="${cardIndex}" data-article-id="${escapeHtml(websiteArticleId(article))}"><img src="${escapeHtml(article.image)}" alt="" width="96" height="76" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span class="home-headline__copy"><b>${index + 1}</b><strong>${escapeHtml(title)}</strong>${firstSentence ? `<p>${escapeHtml(firstSentence)}</p>` : ''}<small>${escapeHtml(article.source)} · ${escapeHtml(dateLabel(article))}</small></span></button>`;
         }).join('')}
-      </div>
+      </div></aside></div>
+      ${homeSportsMarkup(sportsItems)}
+      <section class="home-briefing-cta"><div><strong>${escapeHtml(t('briefing'))}</strong><small>${escapeHtml(t('briefingHint'))}</small></div><button class="secondary-button" type="button" data-action="briefing-open">${escapeHtml(t('briefingCreate'))}</button></section>
       ${homeTodayMarkup(todayData)}
       ${homeServiceMarkup(homeServices)}
       ${personalizedHomeMarkup(homeGroups.personalized)}
@@ -4070,7 +4151,7 @@
     ].filter(Boolean);
     if (!document.documentElement.classList.contains('website-portal')) void ensureHomeTranslations([
       hero,
-      ...briefingItems,
+      ...headlineItems,
       ...todayData.newItems.slice(0, 2),
       ...homeGroups.personalized,
       ...serviceTranslationItems
@@ -4243,6 +4324,7 @@
       </div>
       ${followedContextMarkup()}
       ${cardsMarkup(selected)}
+      ${!selected.length && (state.preferences.sources || []).length ? `<div class="notice-card"><p>${escapeHtml(({ de:'Gefolgte Quellen können ältere Beiträge im Quellenarchiv haben.', en:'Followed sources may have older stories in the source archive.' })[state.language] || 'Followed sources may have older stories in the source archive.')}</p><button class="secondary-button" type="button" data-action="open-archive" data-period="all">${escapeHtml(t('archiveBrowse'))} →</button></div>` : ''}
     `;
   }
 
@@ -4315,6 +4397,7 @@
   async function ensureSourceArchiveManifest() {
     if (state.sourceArchive.manifest) return state.sourceArchive.manifest;
     if (state.sourceArchive.manifestLoading) return null;
+    const epoch = state.sourceArchive.manifestEpoch;
     state.sourceArchive.manifestLoading = true;
     state.sourceArchive.manifestFailed = false;
     const urls = window.WRN_CONFIG?.dataUrls || {};
@@ -4329,20 +4412,33 @@
         cacheToken: state.dataStatus.revision || Date.now(),
         timeoutMs: 20000
       });
-      state.sourceArchive.manifest = normalizedSourceArchiveManifest(payload);
-      void window.WRNStorage?.putDataset?.('news-app-2-source-archive-manifest', payload);
+      if (epoch === state.sourceArchive.manifestEpoch) {
+        state.sourceArchive.manifest = normalizedSourceArchiveManifest(payload);
+        void window.WRNStorage?.putDataset?.('news-app-2-source-archive-manifest', payload);
+      }
     } catch (error) {
       try {
         const cached = await window.WRNStorage?.getDataset?.('news-app-2-source-archive-manifest');
-        state.sourceArchive.manifest = normalizedSourceArchiveManifest(cached);
+        if (epoch === state.sourceArchive.manifestEpoch) {
+          state.sourceArchive.manifest = normalizedSourceArchiveManifest(cached);
+        }
       } catch {
-        state.sourceArchive.manifestFailed = true;
-        console.warn('Source archive manifest unavailable', error);
+        if (epoch === state.sourceArchive.manifestEpoch) {
+          state.sourceArchive.manifestFailed = true;
+          console.warn('Source archive manifest unavailable', error);
+        }
       }
     } finally {
-      state.sourceArchive.manifestLoading = false;
+      if (epoch === state.sourceArchive.manifestEpoch) state.sourceArchive.manifestLoading = false;
     }
     return state.sourceArchive.manifest;
+  }
+
+  function invalidateSourceArchiveManifest() {
+    state.sourceArchive.manifestEpoch += 1;
+    state.sourceArchive.manifest = null;
+    state.sourceArchive.manifestLoading = false;
+    state.sourceArchive.manifestFailed = false;
   }
 
   function sourceArchiveEntry(sourceName) {
@@ -6230,9 +6326,18 @@
 
   function renderSaved() {
     state.cardArticles = [];
+    const readKeys = readArticles();
+    const readCandidates = core.normalizeArticles([
+      ...state.savedArticles,
+      ...bookmarks(),
+      ...state.articles
+    ]);
     const saved = state.savedMode === 'read'
-      ? state.articles.filter(article => isRead(article))
+      ? readCandidates.filter(article => isRead(article))
       : core.normalizeArticles(state.savedArticles.length ? state.savedArticles : bookmarks());
+    const missingReadCount = state.savedMode === 'read'
+      ? readKeys.filter(key => !saved.some(article => article.link === key || article.id === key)).length
+      : 0;
     viewRoot.innerHTML = `
       ${headingMarkup(t('saved'), t('saved'), t('savedIntro'))}
       <div class="saved-tabs" role="tablist">
@@ -6242,6 +6347,7 @@
       ${saved.length
         ? cardsMarkup(saved)
         : `<div class="empty-state"><strong>${escapeHtml(t('emptySaved'))}</strong><p>${escapeHtml(t('emptySavedText'))}</p></div>`}
+      ${missingReadCount ? `<div class="notice-card"><p>${missingReadCount} ${escapeHtml(({ de:'ältere gelesene Beiträge liegen nicht mehr im aktuellen Feed oder lokalen Speicher.', en:'older read stories are no longer in the current feed or local storage.' })[state.language] || 'older read stories are no longer in the current feed or local storage.')}</p><button class="secondary-button" type="button" data-action="open-archive" data-period="all">${escapeHtml(t('archiveBrowse'))} →</button></div>` : ''}
     `;
   }
 
@@ -6296,6 +6402,7 @@
       showToast(t('translationFailed'));
       return;
     }
+    const targetLanguage = state.language;
     button.disabled = true;
     button.setAttribute('aria-busy', 'true');
     const label = button.querySelector('span:last-child');
@@ -6305,15 +6412,17 @@
       const result = await window.WRNSharedTranslations.request({
         title: article.title,
         text: article.intro || core.excerpt(article.content, 230),
+        targetLanguage,
         mode: 'title_and_text',
         signal: window.WRNWebsiteTranslationSignals?.get(button)?.signal
       });
+      if (state.language !== targetLanguage || !button.isConnected) return;
       if (result?.error || !result?.text) throw new Error(result?.message || 'Translation failed');
       const parsed = core.splitTranslatedTeaser(result.text);
       storeTranslation(article, {
         title: parsed.title || article.title,
         intro: parsed.intro || article.intro
-      });
+      }, targetLanguage);
       if (card) {
         const title = card.querySelector('h3');
         if (title) title.textContent = parsed.title || article.title;
@@ -6328,7 +6437,7 @@
         note.setAttribute('role', 'status');
         note.dataset.machineTranslation = 'true';
         window.WRNWebsiteTranslationState?.mark(card, {
-          translationLanguage: state.language,
+          translationLanguage: targetLanguage,
           articleFingerprint: articleTranslationFingerprint(article)
         });
       } else {
@@ -6347,7 +6456,7 @@
           note.setAttribute('role', 'status');
           note.dataset.machineTranslation = 'true';
           window.WRNWebsiteTranslationState?.mark(hero, {
-            translationLanguage: state.language,
+            translationLanguage: targetLanguage,
             articleFingerprint: articleTranslationFingerprint(article)
           });
         }
@@ -7161,7 +7270,8 @@
     const article = state.activeArticle;
     const button = document.getElementById('next-dialog-translate');
     if (!article || !button || !window.WRNSharedTranslations?.request) return;
-    if (translationFor(article)?.fullContent) {
+    const targetLanguage = state.language;
+    if (translationForLanguage(article, targetLanguage)?.fullContent) {
       renderTranslationComparison();
       return;
     }
@@ -7174,15 +7284,17 @@
       let translatedTitle = article.title;
       const translatedParts = [];
       for (let index = 0; index < chunks.length; index += 1) {
+        if (state.language !== targetLanguage || state.activeArticle !== article || !articleDialog.open) return;
         button.querySelector('span:last-child').textContent =
           `${t('translatingPart')} ${index + 1}/${chunks.length}`;
         const result = await window.WRNSharedTranslations.request({
           title: index === 0 ? article.title : '',
           text: chunks[index],
-          targetLanguage: state.language,
+          targetLanguage,
           mode: index === 0 ? 'title_and_text' : 'continuation',
           signal: window.WRNWebsiteTranslationSignals?.get(button)?.signal
         });
+        if (state.language !== targetLanguage || state.activeArticle !== article || !articleDialog.open) return;
         if (result?.error || !result?.text) throw new Error(result?.message || 'Translation failed');
         if (index === 0) {
           const parsed = core.splitTranslatedTeaser(result.text);
@@ -7199,8 +7311,8 @@
         intro: core.excerpt(fullContent || article.intro, 230),
         content: fullContent || article.content || article.intro
       };
-      storeTranslation(article, translated);
-      if (state.activeArticle !== article || !articleDialog.open) return;
+      if (state.language !== targetLanguage || state.activeArticle !== article || !articleDialog.open) return;
+      storeTranslation(article, translated, targetLanguage);
       const dialogTitle = document.getElementById('next-article-title');
       const content = document.getElementById('next-article-content');
       const articleTitle = content?.querySelector('h1');
@@ -8935,6 +9047,9 @@
           });
           const completeArticles = articles.filter(core.hasCompleteArticle);
           if (!completeArticles.length) throw new Error(`No complete articles in ${url}`);
+          if (candidate.revision !== state.dataStatus.revision || candidate.live !== (state.dataStatus.mode === 'live')) {
+            invalidateSourceArchiveManifest();
+          }
           state.articles = completeArticles;
           state.sourceArchive.loadedSources.clear();
           state.sourceArchive.failedSources.clear();
