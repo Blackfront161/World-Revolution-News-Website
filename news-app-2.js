@@ -1955,7 +1955,7 @@
     sourceArchive: {
       manifest: null, manifestLoading: false, manifestFailed: false, manifestEpoch: 0,
       selectedSources: storedArchiveSources, loadedSources: new Set(), failedSources: new Set(),
-      loadingSources: new Set(), sourceQuery: ''
+      loadingSources: new Set(), quickArticleIds: new Set(), sourceQuery: ''
     },
     events: [],
     eventArchiveLoaded: false,
@@ -4036,11 +4036,14 @@
 
   function renderHome() {
     state.cardArticles = [];
-    const sportsItems = state.articles.filter(article =>
+    const quickArticles = state.sourceArchive.quickArticleIds.size
+      ? state.articles.filter(article => state.sourceArchive.quickArticleIds.has(article.id))
+      : state.articles;
+    const sportsItems = quickArticles.filter(article =>
       isSportHeadline(article) && core.isLeadEligible(article)
     ).slice(0, 3);
     const sportIds = new Set(sportsItems.map(article => article.id));
-    const generalArticles = state.articles.filter(article => !sportIds.has(article.id));
+    const generalArticles = quickArticles.filter(article => !sportIds.has(article.id));
     const balanced = core.balanceEditorially(generalArticles, HOME_COUNT, {
       maxPerFamily: 2,
       poolSize: 60
@@ -4095,6 +4098,7 @@
     viewRoot.innerHTML = `
       ${previewNotice || snapshotAction ? `<div class="meta-line">${previewNotice}${snapshotAction}</div>` : ''}
       <div class="section-heading"><span class="section-heading-title">${escapeHtml(t('latest'))}</span><small>${selected.length}</small></div>
+      ${document.documentElement.classList.contains('website-portal') ? `<p class="home-translation-disclosure">${escapeHtml(({ de:'Öffentliche Titel und Anreißer der Startmeldungen werden für die automatische Übersetzung an den WRN-Übersetzungsdienst gesendet. Das Original bleibt erhalten.', en:'Public home-story titles and teasers are sent to the WRN translation service automatically. The original remains available.', es:'Los títulos y avances públicos de portada se envían automáticamente al servicio de traducción de WRN. El original sigue disponible.', fr:'Les titres et résumés publics de la une sont envoyés automatiquement au service de traduction WRN. L’original reste disponible.', it:'Titoli e anticipazioni pubblici della pagina iniziale vengono inviati automaticamente al servizio di traduzione WRN. L’originale resta disponibile.', pt:'Títulos e resumos públicos da página inicial são enviados automaticamente ao serviço de tradução WRN. O original continua disponível.', ru:'Публичные заголовки и анонсы главной страницы автоматически отправляются в службу перевода WRN. Оригинал остаётся доступен.', el:'Οι δημόσιοι τίτλοι και οι περιλήψεις της αρχικής σελίδας αποστέλλονται αυτόματα στην υπηρεσία μετάφρασης WRN. Το πρωτότυπο παραμένει διαθέσιμο.', tr:'Ana sayfadaki herkese açık başlıklar ve özetler otomatik olarak WRN çeviri hizmetine gönderilir. Özgün metin erişilebilir kalır.' })[state.language] || 'Public home-story titles and teasers are sent to the WRN translation service automatically. The original remains available.')}</p>` : ''}
       <div class="home-lead-grid"><article class="home-hero" data-article-id="${escapeHtml(websiteArticleId(hero))}" data-source-language="${escapeHtml(sourceLanguageCode(hero))}" data-article-fingerprint="${escapeHtml(articleTranslationFingerprint(hero))}"${heroTranslation ? ` data-translation-state="cached" data-translation-language="${escapeHtml(state.language)}" data-translation-fingerprint="${escapeHtml(heroTranslation.fingerprint)}"` : ''}>
         ${heroImage}
         <div class="home-hero__content">
@@ -4122,7 +4126,7 @@
           const cardIndex = state.cardArticles.push(article) - 1;
           const title = translationFor(article)?.title || article.title;
           const firstSentence = headlineSentences.get(article.id);
-          return `<button class="home-headline" type="button" data-action="open" data-index="${cardIndex}" data-article-id="${escapeHtml(websiteArticleId(article))}"><img src="${escapeHtml(article.image)}" alt="" width="96" height="76" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span class="home-headline__copy"><b>${index + 1}</b><strong>${escapeHtml(title)}</strong>${firstSentence ? `<p>${escapeHtml(firstSentence)}</p>` : ''}<small>${escapeHtml(article.source)} · ${escapeHtml(dateLabel(article))}</small></span></button>`;
+          return `<button class="home-headline" type="button" data-action="open" data-index="${cardIndex}" data-article-id="${escapeHtml(websiteArticleId(article))}"><img src="${escapeHtml(article.image)}" alt="" width="96" height="76" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span class="home-headline__copy"><b>${index + 1}</b><strong>${escapeHtml(title)}</strong>${firstSentence ? `<p>${escapeHtml(firstSentence)}</p>` : ''}<small>${escapeHtml(article.source)} · ${escapeHtml(dateLabel(article))}</small>${translationFor(article) ? `<small class="translation-note" data-machine-translation="true">${escapeHtml(machineTranslationStatus(article))}</small>` : ''}</span></button>`;
         }).join('')}
       </div></aside></div>
       ${homeSportsMarkup(sportsItems)}
@@ -4140,18 +4144,15 @@
       ...homeServices.developments.map(story => Array.isArray(story.items) ? story.items.at(-1) : null),
       ...homeServices.homeEvents.items
     ].filter(Boolean);
-    if (!document.documentElement.classList.contains('website-portal')) void ensureHomeTranslations([
-      hero,
-      ...headlineItems,
-      ...todayData.newItems.slice(0, 2),
-      ...homeGroups.personalized,
-      ...serviceTranslationItems
-    ]);
+    const isWebsitePortal = document.documentElement.classList.contains('website-portal');
+    void ensureHomeTranslations(isWebsitePortal
+      ? [hero, ...headlineItems]
+      : [hero, ...headlineItems, ...todayData.newItems.slice(0, 2), ...homeGroups.personalized, ...serviceTranslationItems]);
   }
 
   function articleNeedsTeaserTranslation(article, targetLanguage) {
     if (!article || translationForLanguage(article, targetLanguage)) return false;
-    const requestKey = `${targetLanguage}::${article.id}`;
+    const requestKey = `${targetLanguage}::${article.id}::${articleTranslationFingerprint(article)}`;
     if (briefingTranslationsAttempted.has(requestKey)) return false;
     const sourceLanguage = String(
       article.language || article.lang || article.sprache || ''
@@ -4163,7 +4164,8 @@
     if (!window.WRNSharedTranslations?.request || !articleNeedsTeaserTranslation(article, targetLanguage)) {
       return translationForLanguage(article, targetLanguage);
     }
-    const requestKey = `${targetLanguage}::${article.id}`;
+    const fingerprint = articleTranslationFingerprint(article);
+    const requestKey = `${targetLanguage}::${article.id}::${fingerprint}`;
     if (briefingTranslationsInFlight.has(requestKey) || briefingTranslationsAttempted.has(requestKey)) return null;
     briefingTranslationsInFlight.add(requestKey);
     briefingTranslationsAttempted.add(requestKey);
@@ -4180,7 +4182,9 @@
         title: parsed.title || article.title,
         intro: parsed.intro || article.intro
       };
-      storeTranslation(article, translated, targetLanguage);
+      const currentArticle = state.articles.find(item => item.id === article.id);
+      if (articleTranslationFingerprint(currentArticle || article) !== fingerprint) return null;
+      storeTranslation(currentArticle || article, translated, targetLanguage);
       return translated;
     } catch (error) {
       if (!briefingTranslationWarningShown) {
@@ -4245,9 +4249,13 @@
     );
 
     const remaining = needsTranslation.filter(item => articleNeedsTeaserTranslation(item, language));
-    const results = await Promise.allSettled(
-      remaining.map(item => requestBriefingTranslation(item, language))
-    );
+    const results = [];
+    for (let index = 0; index < remaining.length; index += 2) {
+      if (state.view !== 'home' || state.language !== language) break;
+      results.push(...await Promise.allSettled(
+        remaining.slice(index, index + 2).map(item => requestBriefingTranslation(item, language))
+      ));
+    }
     const changed = results.some(result => result.status === 'fulfilled' && result.value);
     if (changed && state.view === 'home' && state.language === language) renderHome();
   }
@@ -4331,6 +4339,10 @@
   ];
 
   function periodArticles(items) {
+    if (state.discover.period === 'current') {
+      const quickIds = state.sourceArchive.quickArticleIds;
+      return quickIds.size ? items.filter(article => quickIds.has(article.id)) : items;
+    }
     if (!['7d', '30d'].includes(state.discover.period)) return items;
     const newest = Math.max(...state.articles.map(article => Number(article.timestamp) || 0));
     if (!Number.isFinite(newest) || newest <= 0) return items;
@@ -4487,7 +4499,7 @@
   }
 
   async function loadSelectedSourceArchives() {
-    if (!['30d', 'all'].includes(state.discover.period)) return;
+    if (!state.sourceArchive.selectedSources.length) return;
     await ensureSourceArchiveManifest();
     if (state.view === 'discover') renderDiscover();
     await Promise.all(state.sourceArchive.selectedSources.map(loadSourceArchive));
@@ -4506,7 +4518,7 @@
   }
 
   function sourceArchiveMarkup() {
-    if (!['30d', 'all'].includes(state.discover.period)) return '';
+    if (!['30d', 'all'].includes(state.discover.period) && !state.sourceArchive.selectedSources.length) return '';
     const manifestSources = state.sourceArchive.manifest?.sources || state.facets.sources.map(name => ({
       name, itemCount: 0, coverage: 'partial', coverageDays: 0
     }));
@@ -4552,7 +4564,7 @@
         region: state.discover.region,
         topic: state.discover.topic
       }));
-    if (['30d', 'all'].includes(state.discover.period) && state.sourceArchive.selectedSources.length) {
+    if (state.sourceArchive.selectedSources.length) {
       const selectedSources = new Set(state.sourceArchive.selectedSources);
       periodItems = periodItems.filter(article => selectedSources.has(article.source));
     }
@@ -4668,6 +4680,9 @@
   }
 
   function renderDiscover() {
+    if (state.discover.period === 'current' && state.sourceArchive.selectedSources.length) {
+      state.discover.period = 'all';
+    }
     state.cardArticles = [];
     const results = discoverResults();
     const total = allDiscoverResults().length;
@@ -7927,6 +7942,10 @@
         state.discover.period = ['current', '7d', '30d', 'all'].includes(target.dataset.value)
           ? target.dataset.value
           : 'current';
+        if (state.discover.period === 'current') {
+          state.sourceArchive.selectedSources = [];
+          state.discover.source = 'all';
+        }
         state.discover.limit = 24;
         persistArchiveFilters();
         renderDiscover();
@@ -7939,6 +7958,7 @@
         else if (source && selected.size < 20) selected.add(source);
         state.sourceArchive.selectedSources = [...selected];
         state.discover.source = 'all';
+        if (selected.size && state.discover.period === 'current') state.discover.period = 'all';
         state.discover.limit = 24;
         persistArchiveFilters();
         renderDiscover();
@@ -8385,8 +8405,9 @@
       };
       if (discoverMap[event.target.id]) {
         state.discover[discoverMap[event.target.id]] = event.target.value;
-        if (discoverMap[event.target.id] === 'source' && event.target.value !== 'all') {
-          state.sourceArchive.selectedSources = [event.target.value];
+        if (discoverMap[event.target.id] === 'source') {
+          state.sourceArchive.selectedSources = event.target.value === 'all' ? [] : [event.target.value];
+          if (event.target.value !== 'all' && state.discover.period === 'current') state.discover.period = 'all';
         }
         state.discover.limit = 24;
         persistArchiveFilters();
@@ -9042,6 +9063,7 @@
             invalidateSourceArchiveManifest();
           }
           state.articles = completeArticles;
+          state.sourceArchive.quickArticleIds = new Set(completeArticles.map(article => article.id));
           state.sourceArchive.loadedSources.clear();
           state.sourceArchive.failedSources.clear();
           void window.WRNStorage?.putDataset?.('news-app-2-news', payload);
@@ -9100,6 +9122,7 @@
         .filter(core.hasCompleteArticle);
       if (offlineArticles.length) {
         state.articles = offlineArticles;
+        state.sourceArchive.quickArticleIds = new Set(offlineArticles.map(article => article.id));
         state.sourceArchive.loadedSources.clear();
         state.sourceArchive.failedSources.clear();
         state.facets = core.collectFacets(offlineArticles);

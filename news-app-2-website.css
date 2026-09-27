@@ -2202,6 +2202,12 @@
 .website-portal #next-view > .meta-line + .section-heading {
   margin-top:24px;
 }
+.website-portal .home-translation-disclosure {
+  margin:0 0 16px;
+  color:var(--muted);
+  font-size:.78rem;
+  line-height:1.45;
+}
 .website-portal .home-lead-grid {
   display:grid;
   grid-template-columns:minmax(0,1.38fr) minmax(300px,.82fr);

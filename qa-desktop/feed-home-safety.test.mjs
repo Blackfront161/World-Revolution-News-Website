@@ -7,7 +7,7 @@ import vm from 'node:vm';
 const root = resolve(import.meta.dirname, '..');
 const read = name => readFileSync(resolve(root, name), 'utf8');
 
-test('live feed uses status revisions and the website only translates on action', () => {
+test('live feed uses status revisions and automatic website translation is limited to public home teasers', () => {
   const window = {};
   vm.runInNewContext(read('news-app-2-config.js'), { window });
   const config = window.WRN_CONFIG;
@@ -22,6 +22,13 @@ test('live feed uses status revisions and the website only translates on action'
   assert.ok(read('news-app-2.js').includes("dataMirrors.videoFeed, dataUrls.videoFeed, 'video-feed.json'"));
   assert.ok(!read('index.html').includes('src="website-auto-translate.js'));
   assert.ok(!read('service-worker.js').includes("'./website-auto-translate.js"));
+  assert.match(read('news-app-2.js'), /isWebsitePortal\s*\? \[hero, \.\.\.headlineItems\]/);
+  assert.match(read('privacy.html'), /Public home-story titles and teasers are sent automatically/);
+  assert.match(read('news-app-2.js'), /remaining\.slice\(index, index \+ 2\)/);
+  assert.match(read('news-app-2.js'), /requestKey = `\$\{targetLanguage\}::\$\{article\.id\}::\$\{fingerprint\}`/);
+  assert.match(read('news-app-2.js'), /articleTranslationFingerprint\(currentArticle \|\| article\) !== fingerprint/);
+  assert.match(read('news-app-2.js'), /if \(!state\.sourceArchive\.selectedSources\.length\) return;/);
+  assert.match(read('news-app-2.js'), /quickIds\.size \? items\.filter\(article => quickIds\.has\(article\.id\)\) : items/);
 });
 
 test('service worker upgrade keeps saved articles and unrelated caches', async () => {
@@ -36,6 +43,8 @@ test('service worker upgrade keeps saved articles and unrelated caches', async (
     'wrn-web-data-2026-09-27-r47',
     'wrn-web-portal-2026-09-27-r48',
     'wrn-web-data-2026-09-27-r48',
+    'wrn-web-portal-2026-09-27-r49',
+    'wrn-web-data-2026-09-27-r49',
     'wrn-saved-articles-v1',
     'another-site-cache'
   ];
@@ -52,7 +61,7 @@ test('service worker upgrade keeps saved articles and unrelated caches', async (
   let work;
   events.get('activate')({ waitUntil: value => { work = value; } });
   await work;
-  assert.deepEqual(deleted.sort(), existing.slice(0, 6).sort());
+  assert.deepEqual(deleted.sort(), existing.slice(0, 10).sort());
 });
 
 test('offline navigation and feed use previously cached responses', async () => {
