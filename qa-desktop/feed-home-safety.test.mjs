@@ -22,7 +22,7 @@ test('live feed uses status revisions and automatic website translation is limit
   assert.ok(read('news-app-2.js').includes("dataMirrors.videoFeed, dataUrls.videoFeed, 'video-feed.json'"));
   assert.ok(!read('index.html').includes('src="website-auto-translate.js'));
   assert.ok(!read('service-worker.js').includes("'./website-auto-translate.js"));
-  assert.match(read('news-app-2.js'), /isWebsitePortal\s*\? \[hero, \.\.\.headlineItems\]/);
+  assert.match(read('news-app-2.js'), /isWebsitePortal\s*\? \[hero, \.\.\.headlineItems, \.\.\.sportsItems, \.\.\.briefingItems\]/);
   assert.match(read('privacy.html'), /Public home-story titles and teasers are sent automatically/);
   assert.match(read('news-app-2.js'), /remaining\.slice\(index, index \+ 2\)/);
   assert.match(read('news-app-2.js'), /requestKey = `\$\{targetLanguage\}::\$\{article\.id\}::\$\{fingerprint\}`/);

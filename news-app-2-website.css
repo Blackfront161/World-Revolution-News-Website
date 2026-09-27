@@ -2268,6 +2268,7 @@
   background:var(--card-bg);
   color:var(--text);
   text-align:left;
+  text-decoration:none;
   cursor:pointer;
 }
 .website-portal .home-headline img {
@@ -2361,6 +2362,7 @@
   background:var(--card-bg);
   color:var(--text);
   text-align:left;
+  text-decoration:none;
   cursor:pointer;
 }
 .website-portal .home-sports li img {
@@ -2381,6 +2383,26 @@
 .website-portal .home-sports li small {
   color:var(--muted);
 }
+.website-portal .home-sports li p {
+  margin:0;
+  color:var(--soft-copy);
+  font-size:.78rem;
+  line-height:1.4;
+}
+.website-portal .briefing-strip {
+  margin:0 0 28px;
+}
+.website-portal .briefing-item {
+  min-height:0;
+  align-items:start;
+  overflow-wrap:anywhere;
+  text-decoration:none;
+}
+.website-portal .briefing-item small {
+  display:block;
+  overflow:visible;
+  -webkit-line-clamp:unset;
+}
 .website-portal .home-briefing-cta {
   display:flex;
   align-items:center;
@@ -2398,6 +2420,9 @@
 }
 .website-portal .home-briefing-cta small {
   color:var(--muted);
+}
+.website-portal #next-view > .section-heading:first-child {
+  margin-top:0;
 }
 @media (max-width:980px) {
   .website-portal .home-lead-grid { grid-template-columns:minmax(0,1fr); }

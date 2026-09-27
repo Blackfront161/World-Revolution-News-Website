@@ -4,13 +4,13 @@ Offizielle Website von **World Revolution News / Solinaridao**. Sie stellt mehrs
 
 - Live: <https://solinaridao.com/>
 - Letzter hier dokumentierter Produktionsstand: **r10n** vom 20. August 2026; Live-Abgleich vor der nächsten Freigabe erforderlich
-- Aktueller, noch nicht veröffentlichter Arbeitsbranch: `codex/website-home-feed-2026-09-27` (letzter Funktionscommit `a6ca5e9`)
-- Arbeitskandidat: Website-CSS **Release 41**, Haupt-JavaScript **53-web22**, Website-JavaScript **24**, Service Worker **2026-09-27-r52**
+- Aktueller, noch nicht veröffentlichter Arbeitsbranch: `codex/website-home-feed-2026-09-27`
+- Arbeitskandidat: Website-CSS **Release 42**, Haupt-JavaScript **54-web23**, Website-JavaScript **24**, Service Worker **2026-09-27-r53**
 - Hosting: statische Apache-/Hostinger-Website
 
 > Dieser Ordner enthält einen neueren, noch nicht live geschalteten Website-Kandidaten. App und Website sind getrennte Produkte. Website-spezifische Navigation, SEO, Landingpages und Responsive-CSS dürfen nicht ungeprüft in die Android-App übernommen werden.
 
-Im aktuellen Kandidaten sind Start/„Für mich“/Entdecken/Medien/Gespeichert, Artikel-Deep-Links, Quellarchive, Themes, Offline-Leselisten und die Website-spezifischen App-/Spendenaktionen erreichbar. Das Quellenarchiv wurde am 27. September lokal mit 189 Evrensel-Treffern und funktionierendem Nachladen geprüft. Auf schmalen Tablets bleibt der Marken-Untertitel vollständig sichtbar; im Smartphone-Reader sind alle sechs Aktionen in einer kompakten Leiste zugänglich. Lokale Diagnosehinweise lassen sich ohne automatische Übertragung exportieren oder löschen. Diese Prüfungen ersetzen keine Freigabe des Feed- und Podcast-Betriebs auf der öffentlichen Domain.
+Im aktuellen Kandidaten sind Start/„Für mich“/Entdecken/Medien/Gespeichert, Artikel-Deep-Links, Quellarchive, Themes, Offline-Leselisten und die Website-spezifischen App-/Spendenaktionen erreichbar. Die Startseite übernimmt aus der aktuellen App den Umfang von 15 Meldungen, „Das Wichtigste“, „Sport & Fankultur“ und fünf verlinkte Kurzüberblick-Meldungen; das Layout bleibt webbasiert. Das Quellenarchiv wurde am 27. September lokal mit 189 Evrensel-Treffern und funktionierendem Nachladen geprüft. Auf schmalen Tablets bleibt der Marken-Untertitel vollständig sichtbar; im Smartphone-Reader sind alle sechs Aktionen in einer kompakten Leiste zugänglich. Lokale Diagnosehinweise lassen sich ohne automatische Übertragung exportieren oder löschen. Diese Prüfungen ersetzen keine Freigabe des Feed- und Podcast-Betriebs auf der öffentlichen Domain.
 
 ## Architektur
 
@@ -52,7 +52,7 @@ Die QA-Ordner enthalten sowohl wiederverwendbare Funktionsprüfungen als auch ve
 node --test qa-desktop/*.test.mjs
 ```
 
-Diese 15 aktuellen Tests bestanden am 27. September 2026. Die historischen `qa-r10m`-Verträge erwarten ältere Versionsnummern; ihre Chrome-Reflow-Läufe scheiterten auf dieser Maschine zusätzlich an einem GPU-Prozessfehler. Das ist kein bestandener Ersatz für einen späteren Produktions-Browser-Test.
+Diese 16 aktuellen Tests bestanden am 27. September 2026. Die historischen `qa-r10m`-Verträge erwarten ältere Versionsnummern; ihre Chrome-Reflow-Läufe scheiterten auf dieser Maschine zusätzlich an einem GPU-Prozessfehler. Das ist kein bestandener Ersatz für einen späteren Produktions-Browser-Test.
 
 Vor einer neuen Veröffentlichung müssen außerdem folgende Kontrollen gegen den tatsächlichen Kandidaten laufen:
 

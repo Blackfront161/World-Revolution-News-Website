@@ -30,7 +30,7 @@
   const BRIEFING_HISTORY_KEY = 'wrn_briefing_history_v1';
   const LAST_VISIT_KEY = 'wrn_last_visit_v1';
   const DEVELOPMENT_SNAPSHOT_KEY = 'wrn_development_snapshot_v1';
-  const HOME_COUNT = 10;
+  const HOME_COUNT = 15;
   const BRIEFING_DURATIONS = Object.freeze([3, 5, 10, 20]);
   const DAILY_EDITION_ITEM_COUNTS = Object.freeze([5, 7, 10]);
   const DAILY_EDITION_TYPES = Object.freeze(['morning', 'daily', 'weekly']);
@@ -3999,29 +3999,30 @@
 
   function homeSportsMarkup(items) {
     const labels = {
-      de: ['Sport & Gesellschaft', 'Im aktuellen Feed gibt es noch keine geprüfte Sportmeldung.'],
-      en: ['Sport & society', 'There are no verified sports stories in the current feed yet.'],
-      es: ['Deporte y sociedad', 'Todavía no hay noticias deportivas verificadas en el feed actual.'],
-      fr: ['Sport et société', 'Le flux actuel ne contient pas encore d’article sportif vérifié.'],
-      it: ['Sport e società', 'Il feed attuale non contiene ancora notizie sportive verificate.'],
-      pt: ['Esporte e sociedade', 'Ainda não há notícias esportivas verificadas no feed atual.'],
-      ru: ['Спорт и общество', 'В текущей ленте пока нет проверенных спортивных новостей.'],
-      el: ['Αθλητισμός και κοινωνία', 'Η τρέχουσα ροή δεν περιέχει ακόμη επαληθευμένες αθλητικές ειδήσεις.'],
-      tr: ['Spor ve toplum', 'Güncel akışta henüz doğrulanmış spor haberi yok.']
+      de: ['Sport & Fankultur', 'Im aktuellen Feed gibt es noch keine geprüfte Sportmeldung.'],
+      en: ['Sport & fan culture', 'There are no verified sports stories in the current feed yet.'],
+      es: ['Deporte y cultura de hinchas', 'Todavía no hay noticias deportivas verificadas en el feed actual.'],
+      fr: ['Sport et culture des supporters', 'Le flux actuel ne contient pas encore d’article sportif vérifié.'],
+      it: ['Sport e cultura dei tifosi', 'Il feed attuale non contiene ancora notizie sportive verificate.'],
+      pt: ['Esporte e cultura de torcidas', 'Ainda não há notícias esportivas verificadas no feed atual.'],
+      ru: ['Спорт и культура болельщиков', 'В текущей ленте пока нет проверенных спортивных новостей.'],
+      el: ['Αθλητισμός και κουλτούρα φιλάθλων', 'Η τρέχουσα ροή δεν περιέχει ακόμη επαληθευμένες αθλητικές ειδήσεις.'],
+      tr: ['Spor ve taraftar kültürü', 'Güncel akışta henüz doğrulanmış spor haberi yok.']
     };
     const [heading, empty] = labels[state.language] || labels.en;
     return `<section class="home-sports" aria-labelledby="home-sports-title">
       <div class="home-sports__heading"><span aria-hidden="true">★</span><h2 id="home-sports-title">${escapeHtml(heading)}</h2></div>
       ${items.length ? `<ul>${items.map(article => {
         const cardIndex = state.cardArticles.push(article) - 1;
-        return `<li><button type="button" data-action="open" data-index="${cardIndex}" data-article-id="${escapeHtml(websiteArticleId(article))}">${article.image ? `<img src="${escapeHtml(article.image)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : ''}<span><strong>${escapeHtml(translationFor(article)?.title || article.title)}</strong><small>${escapeHtml(article.source)} · ${escapeHtml(dateLabel(article))}</small></span></button></li>`;
+        const sentence = homeHeadlineSentence(article);
+        return `<li><button type="button" data-action="open" data-index="${cardIndex}" data-article-id="${escapeHtml(websiteArticleId(article))}">${article.image ? `<img src="${escapeHtml(article.image)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : ''}<span><strong>${escapeHtml(translationFor(article)?.title || article.title)}</strong>${sentence ? `<p>${escapeHtml(sentence)}</p>` : ''}<small>${escapeHtml(article.source)} · ${escapeHtml(dateLabel(article))}</small></span></button></li>`;
       }).join('')}</ul>` : `<p>${escapeHtml(empty)}</p>`}
     </section>`;
   }
 
   function isSportHeadline(article) {
-    return /\b(?:futbol|fútbol|fussball|football|soccer|basketball|volleyball|voleybol|tennis|cricket)\b/i
-      .test(String(article?.title || ''));
+    return /\b(?:sport|futbol|fútbol|fußball|fussball|football|soccer|basketball|volleyball|voleybol|tennis|cricket|cycling|radsport|ultras?|fankultur|fan culture)\b/i
+      .test([article?.primaryTopic, ...(article?.categories || []), article?.title].join(' '));
   }
 
   function homeHeadlineSentence(article) {
@@ -4043,16 +4044,17 @@
     const quickArticles = state.sourceArchive.quickArticleIds.size
       ? state.articles.filter(article => state.sourceArchive.quickArticleIds.has(article.id))
       : state.articles;
-    const sportsItems = quickArticles.filter(article =>
+    const sportsItems = core.balanceBySource(quickArticles.filter(article =>
       isSportHeadline(article) && core.isLeadEligible(article)
-    ).slice(0, 3);
+    ), 3, 1);
     const sportIds = new Set(sportsItems.map(article => article.id));
     const generalArticles = quickArticles.filter(article => !sportIds.has(article.id));
-    const balanced = core.balanceEditorially(generalArticles, HOME_COUNT, {
+    const balanced = core.balanceEditorially(generalArticles, HOME_COUNT + 12, {
       maxPerFamily: 2,
-      poolSize: 60
+      poolSize: 90
     });
-    const hero = balanced.find(core.isLeadEligible)
+    const hero = balanced.find(article => core.isLeadEligible(article) && article.image)
+      || balanced.find(core.isLeadEligible)
       || generalArticles.find(core.isLeadEligible);
     if (!hero) return renderError();
     const selected = [hero, ...balanced.filter(article => article.id !== hero.id)]
@@ -4070,8 +4072,15 @@
       headlineSentences.set(article.id, sentence);
     }
     const visibleLeadIds = new Set([hero.id, ...headlineItems.map(article => article.id), ...sportIds]);
+    const briefingSeen = new Set();
+    const briefingItems = quickArticles.filter(article => {
+      if (!core.isLeadEligible(article) || selected.some(item => item.id === article.id)
+        || visibleLeadIds.has(article.id) || briefingSeen.has(article.id)) return false;
+      briefingSeen.add(article.id);
+      return true;
+    }).slice(0, 5);
     const homeServices = homeServiceData();
-    const todayData = homeTodayData(headlineItems, homeServices);
+    const todayData = homeTodayData(briefingItems, homeServices);
     state.editorialQuality = core.editorialQuality(selected);
     viewRoot.dataset.sourceFamilies = String(state.editorialQuality.uniqueSourceFamilies);
     viewRoot.dataset.maxSourceStreak = String(state.editorialQuality.maxSourceStreak);
@@ -4080,7 +4089,7 @@
       [...visibleLeadIds]
     );
     const headlineLabels = {
-      de: 'Hauptmeldungen', en: 'Top stories', es: 'Noticias destacadas',
+      de: 'Das Wichtigste', en: 'The essentials', es: 'Lo más importante',
       fr: 'À la une', it: 'Notizie principali', pt: 'Notícias em destaque',
       ru: 'Главные новости', el: 'Κύριες ειδήσεις', tr: 'Öne çıkan haberler'
     };
@@ -4135,6 +4144,14 @@
       </div></aside></div>
       ${homeSportsMarkup(sportsItems)}
       <section class="home-briefing-cta"><div><strong>${escapeHtml(t('briefing'))}</strong><small>${escapeHtml(t('briefingHint'))}</small></div><button class="secondary-button" type="button" data-action="briefing-open">${escapeHtml(t('briefingCreate'))}</button></section>
+      <div class="briefing-strip" aria-label="${escapeHtml(t('briefing'))}">
+        ${briefingItems.map((article, index) => {
+          const cardIndex = state.cardArticles.push(article) - 1;
+          const title = translationFor(article)?.title || article.title;
+          const sentence = homeHeadlineSentence(article);
+          return `<button class="briefing-item" type="button" data-action="open" data-index="${cardIndex}" data-article-id="${escapeHtml(websiteArticleId(article))}" data-briefing-id="${escapeHtml(article.id)}"><b>${index + 1}</b><span class="briefing-item__copy"><strong>${escapeHtml(title)}</strong>${sentence ? `<small>${escapeHtml(sentence)}</small>` : ''}</span></button>`;
+        }).join('')}
+      </div>
       ${homeTodayMarkup(todayData)}
       ${homeServiceMarkup(homeServices)}
       ${personalizedHomeMarkup(homeGroups.personalized)}
@@ -4150,7 +4167,7 @@
     ].filter(Boolean);
     const isWebsitePortal = document.documentElement.classList.contains('website-portal');
     void ensureHomeTranslations(isWebsitePortal
-      ? [hero, ...headlineItems]
+      ? [hero, ...headlineItems, ...sportsItems, ...briefingItems]
       : [hero, ...headlineItems, ...todayData.newItems.slice(0, 2), ...homeGroups.personalized, ...serviceTranslationItems]);
   }
 

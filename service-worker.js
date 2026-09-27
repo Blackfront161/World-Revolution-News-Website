@@ -1,8 +1,8 @@
 /* World Revolution News – Offline Service Worker · News App 2 release 2026-09-27 */
 'use strict';
 
-const APP_CACHE = 'wrn-web-portal-2026-09-27-r52';
-const DATA_CACHE = 'wrn-web-data-2026-09-27-r52';
+const APP_CACHE = 'wrn-web-portal-2026-09-27-r53';
+const DATA_CACHE = 'wrn-web-data-2026-09-27-r53';
 const MANAGED_CACHE_PREFIXES = ['wrn-web-portal-', 'wrn-web-data-'];
 
 const APP_SHELL = [
@@ -34,7 +34,7 @@ const APP_SHELL = [
   './prisoner-solidarity.css?release=2',
   './zine-designer.css?release=5',
   './source-verification.css?release=1',
-  './news-app-2-website.css?release=41',
+  './news-app-2-website.css?release=42',
   './article-landing.css?release=1',
   './news-app-2-config.js?release=14',
   './native-device-bridge.js?release=2',
@@ -60,7 +60,7 @@ const APP_SHELL = [
   './website-editorial-text.js?release=3',
   './website-portal-core.js?release=6',
   './website-local-diagnostics.js?release=1',
-  './news-app-2.js?release=53-web22',
+  './news-app-2.js?release=54-web23',
   './news-app-2-website.js?release=24',
   './website-swipe-navigation.js?release=1',
   './website-translation-state.js?release=1',
