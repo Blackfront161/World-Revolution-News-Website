@@ -2410,3 +2410,44 @@
   .website-portal .home-sports li { max-width:none; }
   .website-portal .home-briefing-cta { align-items:flex-start; flex-direction:column; }
 }
+
+/* The wide theme subtitle must remain fully visible beside the action row on
+   landscape phones and narrow tablets. The mark and subtitle move together. */
+@media (min-width:561px) and (max-width:700px) {
+  .website-portal .brand {
+    translate:32px 0;
+  }
+}
+
+/* Six reader actions remain visible without consuming half a phone screen. */
+@media (max-width:700px) {
+  :root.website-portal:not([data-font-size="200"]) .article-dialog .dialog-actions {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px;
+    overflow-x:hidden;
+    overflow-y:auto;
+  }
+
+  :root.website-portal:not([data-font-size="200"]) .article-dialog .dialog-actions > button {
+    width:100%;
+    min-width:0;
+    max-width:none;
+    min-height:44px;
+    padding:7px 4px;
+    font-size:clamp(.7rem,2.8vw,.8rem);
+    line-height:1.15;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+
+  :root.website-portal:not([data-font-size="200"]) .article-dialog #next-dialog-summary span[aria-hidden="true"] {
+    display:none;
+  }
+}
+
+@media (max-width:360px) {
+  :root.website-portal:not([data-font-size="200"]) .article-dialog .dialog-actions {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}

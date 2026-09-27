@@ -3550,10 +3550,14 @@
         <div><span>${escapeHtml(t('videoViewed'))}</span><strong>${Array.isArray(state.videoHistory) ? state.videoHistory.length : 0}</strong></div>
         <div><span>${escapeHtml(t('offlineArticles'))}</span><strong>${state.savedArticles.filter(article => article.offlineReady).length}</strong></div>
         <div><span>${escapeHtml(t('briefingHistory'))}</span><strong>${state.briefingHistory.length}</strong></div>
+        <div><span>${escapeHtml(t('localErrors'))}</span><strong>${window.WRNLocalDiagnostics?.count?.() || 0}</strong></div>
       </div>
+      <p>${escapeHtml(t('diagnosticsIntro'))}</p>
       <div class="release-action-grid">
         <button type="button" data-action="data-export">${escapeHtml(t('exportBackup'))}</button>
         <button type="button" data-action="data-import">${escapeHtml(t('importBackup'))}</button>
+        <button type="button" data-action="diagnostics-export">${escapeHtml(t('exportDiagnostics'))}</button>
+        <button type="button" data-action="diagnostics-clear">${escapeHtml(t('clearDiagnostics'))}</button>
         <button type="button" data-action="data-clear-reading">${escapeHtml(t('clearReading'))}</button>
         <button type="button" data-action="data-clear-offline">${escapeHtml(t('clearOffline'))}</button>
         <button type="button" data-action="data-clear-all">${escapeHtml(t('clearAll'))}</button>
