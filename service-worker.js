@@ -1,7 +1,7 @@
 /* World Revolution News – Offline Service Worker · News App 2 release 2026-09-27 */
 'use strict';
 
-const APP_CACHE = 'wrn-web-portal-2026-09-27-r46';
+const APP_CACHE = 'wrn-web-portal-2026-11-11-r47';
 const DATA_CACHE = 'wrn-web-data-2026-09-27-r46';
 const MANAGED_CACHE_PREFIXES = ['wrn-web-portal-', 'wrn-web-data-'];
 
@@ -39,7 +39,7 @@ const APP_SHELL = [
   './news-app-2-config.js?release=14',
   './native-device-bridge.js?release=2',
   './offline-db.js?release=2',
-  './news-app-2-core.js?release=6',
+  './news-app-2-core.js?release=7',
   './news-app-2-specialty.js?release=3',
   './wrn-product-21.js?release=1',
   './news-app-2-media.js?release=2',
@@ -59,7 +59,7 @@ const APP_SHELL = [
   './website-language-origin.js?release=3',
   './website-editorial-text.js?release=3',
   './website-portal-core.js?release=6',
-  './news-app-2.js?release=50-web17',
+  './news-app-2.js?release=52-web18',
   './news-app-2-website.js?release=24',
   './website-translation-state.js?release=1',
   './website-translation-queue.js?release=3',
@@ -204,7 +204,7 @@ self.addEventListener('fetch', event => {
   if (
     DATA_FILES.has(url.pathname)
     || /\/news-detail-\d+\.json$/i.test(url.pathname)
-    || /\/news-archive\/[a-z0-9_-]+\.json$/i.test(url.pathname)
+    || /\/news-archive\/(?:details\/)?[a-z0-9_-]+\.json$/i.test(url.pathname)
   ) {
     event.respondWith(networkFirstData(request));
     return;
@@ -257,26 +257,29 @@ async function networkFirstNavigation(request) {
 }
 
 async function networkFirstData(request) {
-  const cache = await caches.open(DATA_CACHE);
   try {
     const response = await fetchWithTimeout(request, 8000);
-    if (response?.ok) await cache.put(request, response.clone());
+    if (response?.ok) {
+      try { const cache = await caches.open(DATA_CACHE); await cache.put(request, response.clone()); }
+      catch (error) { console.warn('Data cache write failed; serving network response', error); }
+    }
     return response;
   } catch {
-    const cached = await cache.match(
-      request,
-      { ignoreSearch: true }
-    );
+    for (const name of [DATA_CACHE, APP_CACHE]) {
+      try { const cached = await (await caches.open(name)).match(request, { ignoreSearch: true });
+        if (cached) return cached;
+      } catch {}
+    }
     const url = new URL(request.url);
-    const fallback = /\/news-archive\/[a-z0-9_-]+\.json$/i.test(url.pathname)
-      ? '[]'
-      : JSON_FALLBACKS.get(url.pathname) || 'null';
-    return cached || new Response(fallback, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'X-WRN-Offline-Fallback': 'empty'
-      }
+    if (/\/news-archive(?:-manifest\.json|\/)/i.test(url.pathname) || /\/news-detail-\d+\.json$/i.test(url.pathname)) {
+      return new Response(JSON.stringify({ error: 'Article archive unavailable offline' }), {
+        status: 503, headers: { 'Content-Type': 'application/json; charset=utf-8' }
+      });
+    }
+    const solidarityFallback = url.pathname === new URL('./solidarity-network.json', self.location.href).pathname;
+    return new Response(JSON_FALLBACKS.get(url.pathname) || 'null', {
+      status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8',
+        'X-WRN-Offline-Fallback': 'empty' }
     });
   }
 }
