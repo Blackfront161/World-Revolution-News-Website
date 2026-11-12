@@ -34,6 +34,7 @@ jobs:
         run: |
           node tests/test_immutable_article_details.js
           node tests/test_archive_cache_delivery.js
+          node tests/test_full_article_rendering.js
 
       - name: Capture clean 935-page baseline
         shell: bash
